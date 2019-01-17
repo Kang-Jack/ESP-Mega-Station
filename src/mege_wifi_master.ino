@@ -1,6 +1,5 @@
 #include <Wire.h> 
 
-
 #include <DS3231.h>
 
 #include <Adafruit_Sensor.h>
@@ -9,7 +8,7 @@
 #include <LiquidCrystal_I2C.h>
 
 #define DispDelay 5000        //displayTime
-
+#define ActiveMins 3        //displayTime
 DS3231 Clock;
 
 bool Century = false;
@@ -21,12 +20,17 @@ byte year, month, date, DoW, hour, minute, second;
 char data[15];
 char Str_year[3], Str_month[3], Str_date[3], Str_DoW[3], Str_hour[3], Str_minute[3], Str_second[3];
 //uint8_t bell[8] = { 0x4,0xe,0xe,0xe,0x1f,0x0,0x4 };
+int ActivedTime=0;
 
 Adafruit_BME280 bme; // I2C
 bool bmeStatus = false; 
 float hum;    // Stores humidity value in percent
 float temp;   // Stores temperature value in Celcius
 float pres;
+
+
+int ripPin = 22;               // choose the input pin (for PIR sensor)
+int ripVal = LOW;                    // variable for reading the pin status
 
 LiquidCrystal_I2C lcd(0x3f,20,4);  // set the LCD address to 0x3f for a 16 chars and 2 line display
 bool lightStatus = false;
@@ -36,6 +40,7 @@ char msg[max_length];   // initialise storage buffer (i haven't tested to this c
 
 void setup()
 {
+  pinMode(ripPin, INPUT);  
   bmeStatus = bme.begin(0x76);
   lcd.init();
   lcd.noAutoscroll();
@@ -53,26 +58,18 @@ void setup()
 void loop()
 {
   setTime();
-    delay(500);
-    int hour = Clock.getHour(h12, PM);
-    if (hour > 1 & hour < 6){
-        if (lightStatus==true){
-          lcd.noBacklight();
-          lightStatus =false;
-       }
-    }
-    else{
-       if (lightStatus==false){
-          lcd.backlight();
-          lightStatus =true;
-       }
-       if (Clock.getSecond()%60 == 0)
-       {
-          handleBME280();
-          displayHumAtm(bmeStatus);
-          displayTimeTemp(bmeStatus);
-       }
-    }   
+  delay(500);
+  int nowSeconds=Clock.getSecond();
+  int nowHour = Clock.getHour(h12, PM);
+  handleLight(nowSeconds,nowHour);
+  if (isWorkingTime(nowHour)){
+    if (nowSeconds%60 == 0)
+      {
+        handleBME280();
+        displayHumAtm(bmeStatus);
+        displayTimeTemp(bmeStatus);
+      }
+  }
     if(msg[0]!='\0'){ 
       Serial.print((char*)msg);
       lcdCleanLine(0);
@@ -123,7 +120,53 @@ void talk_esp()
       Serial2.write(a);
     }
  }
- 
+bool isWorkingTime(int hour){
+  if (hour > 1 & hour < 6){
+    return false;
+  }
+  return true;
+}
+
+void handleLight(int nowS,int nowH){
+  if (lightStatus==true){
+    if (nowS%60 == 0)
+    {
+      ActivedTime=ActivedTime+1;
+    }
+  }
+  if ((ActivedTime < ActiveMins) && lightStatus==true)
+    return;
+  if (!needLightOn(nowH)){
+      if (lightStatus==true){
+        lcd.noBacklight();
+        lightStatus =false;  
+        Serial.print("turn off light");
+        
+     }
+      ActivedTime=0;
+  }
+  else{
+     if (lightStatus==false){
+        lcd.backlight();
+        lightStatus =true;
+        Serial.print("turn on light");
+     }
+     ActivedTime=0;
+  }  
+}
+bool needLightOn(int nowH){
+    if (!isWorkingTime(nowH)){
+      return false;
+    }
+    ripVal = digitalRead(ripPin);  // read input value
+    if (ripVal == LOW){
+      return false;
+    }
+    if (ripVal == HIGH ){
+      return true;
+    }
+
+}
 void color (unsigned char red, unsigned char green, unsigned char blue) 
 {
   lcd.setCursor(3,0);
@@ -192,13 +235,13 @@ void lcdCleanLine(int row){
   lcd.print(emptyLine);
 }
 void setTime() {
-    if (Serial.available() >= 14)     //串口读取数据
+    if (Serial.available() >= 14)     //涓插彛璇诲彇鏁版嵁
     {
         for (int a = 0; a < 14; a++)
         {
             data[a] = Serial.read();
         }
-        Str_year[0] = data[0];    //拆包
+        Str_year[0] = data[0];    //鎷嗗寘
         Str_year[1] = data[1];
         Str_month[0] = data[2];
         Str_month[1] = data[3];
@@ -214,7 +257,7 @@ void setTime() {
         Str_second[1] = data[13];
 
         //Str to byte
-        year = atoi(Str_year);    //转换数据类型
+        year = atoi(Str_year);    //杞崲鏁版嵁绫诲瀷
         month = atoi(Str_month);
         date = atoi(Str_date);
         DoW = atoi(Str_DoW);
@@ -263,8 +306,8 @@ void displayTimeTemp(bool bemStatus) {
     //Serial.print('\n');
 
     lcd.setCursor(0, 1);
-    lcd.print("20");  // 显示20世纪
-    if (year >= 10)  // 显示年份
+    lcd.print("20");  // 鏄剧ず20涓栫邯
+    if (year >= 10)  // 鏄剧ず骞翠唤
     {
         lcd.print(year, DEC);
     }
@@ -276,7 +319,7 @@ void displayTimeTemp(bool bemStatus) {
     lcd.print('-');
 
     lcd.setCursor(5, 1);
-    if (month >= 10)  // 显示月份
+    if (month >= 10)  // 鏄剧ず鏈堜唤
     {
         lcd.print(month, DEC);
     }
@@ -288,7 +331,7 @@ void displayTimeTemp(bool bemStatus) {
     lcd.print('-');
 
     lcd.setCursor(8, 1);
-    if (date >= 10)  // 显示日期
+    if (date >= 10)  // 鏄剧ず鏃ユ湡
     {
         lcd.print(date, DEC);
     }
@@ -299,12 +342,12 @@ void displayTimeTemp(bool bemStatus) {
     }
 
     lcd.setCursor(11, 1);
-    switch (dow)  // 显示星期
+    switch (dow)  // 鏄剧ず鏄熸湡
     {
-    case 1:  // 当dow等于1时，执行以下语句
+    case 1:  // 褰揹ow绛変簬1鏃讹紝鎵ц浠ヤ笅璇彞
         lcd.print("Mon");
         break;
-    case 2:  // 当dow等于2时，执行以下语句
+    case 2:  // 褰揹ow绛変簬2鏃讹紝鎵ц浠ヤ笅璇彞
         lcd.print("Tue");
         break;
     case 3:
@@ -324,8 +367,8 @@ void displayTimeTemp(bool bemStatus) {
         break;
     }
 
-    lcd.setCursor(0, 2);  //光标移至第2行
-    if (hour >= 10)  // 显示小时
+    lcd.setCursor(0, 2);  //鍏夋爣绉昏嚦绗�2琛�
+    if (hour >= 10)  // 鏄剧ず灏忔椂
     {
         lcd.print(hour, DEC);
     }
@@ -337,7 +380,7 @@ void displayTimeTemp(bool bemStatus) {
     lcd.print(':');
 
     lcd.setCursor(3, 2);
-    if (minute >= 10)  // 显示分钟
+    if (minute >= 10)  // 鏄剧ず鍒嗛挓
     {
         lcd.print(minute, DEC);
     }
@@ -350,7 +393,7 @@ void displayTimeTemp(bool bemStatus) {
     lcd.print(':');
 
     lcd.setCursor(6, 2);
-    if (second >= 10)  // 显示秒钟
+    if (second >= 10)  // 鏄剧ず绉掗挓
     {
         lcd.print(second, DEC);
     }
@@ -361,7 +404,7 @@ void displayTimeTemp(bool bemStatus) {
     }
     */
     lcd.setCursor(5, 2);
-    if (Clock.checkAlarmEnabled(1))  // 显示闹钟标识
+    if (Clock.checkAlarmEnabled(1))  // 鏄剧ず闂归挓鏍囪瘑
     {
         lcd.write(0x00);
     }
@@ -381,3 +424,4 @@ void displayTimeTemp(bool bemStatus) {
     }
 
 }
+
