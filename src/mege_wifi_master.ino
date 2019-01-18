@@ -29,7 +29,7 @@ float temp;   // Stores temperature value in Celcius
 float pres;
 
 
-int ripPin = 22;               // choose the input pin (for PIR sensor)
+int ripPin = 8;               // choose the input pin (for PIR sensor)
 int ripVal = LOW;                    // variable for reading the pin status
 
 LiquidCrystal_I2C lcd(0x3f,20,4);  // set the LCD address to 0x3f for a 16 chars and 2 line display
@@ -49,7 +49,7 @@ void setup()
   lcd.clear();
   lcdFirstLine();
   Serial.begin(9600);
-  Serial2.begin(9600);
+  Serial2.begin(115200);
 
   Serial.println("Please enter the time: year[2]month[2]date[2]DoW[2]hour[2]minute[2]second[2]");
   Serial.println("example: 2014-12-3 Wednesday 14:15:15 enter:14120303141515");
@@ -70,27 +70,10 @@ void loop()
         displayTimeTemp(bmeStatus);
       }
   }
-    if(msg[0]!='\0'){ 
-      Serial.print((char*)msg);
-      lcdCleanLine(0);
-      lcd.setCursor(0,0);
-      lcd.print(msg);
-      /*
-      String msgString((char*)msg);
-      if (msgString == "red") color(255, 0, 0); // red
-      if (msgString == "blue") color(0, 0, 255); // blue  
-      if (msgString == "green") color(0,255, 0); //green
-      if (msgString == "yellow") color(255,255,0); // yellow  
-      if (msgString == "purple") color(128,0,255); // purple 
-      if (msgString == "close") color(0,0,0); // close 
-      */
-      Serial2.print("received");
-      msg[0] ='\0';
-    }
-    if (msg[0]!='\0') color(255,255,255); // white  
-    listen_esp();
-    talk_esp();
-    delay(100);
+  handleCmd();
+  listen_esp();
+  talk_esp();
+  delay(100);
 }
 void listen_esp()
 {
@@ -137,21 +120,10 @@ void handleLight(int nowS,int nowH){
   if ((ActivedTime < ActiveMins) && lightStatus==true)
     return;
   if (!needLightOn(nowH)){
-      if (lightStatus==true){
-        lcd.noBacklight();
-        lightStatus =false;  
-        Serial.print("turn off light");
-        
-     }
-      ActivedTime=0;
+     turnOff();
   }
   else{
-     if (lightStatus==false){
-        lcd.backlight();
-        lightStatus =true;
-        Serial.print("turn on light");
-     }
-     ActivedTime=0;
+     turnOn();
   }  
 }
 bool needLightOn(int nowH){
@@ -165,11 +137,71 @@ bool needLightOn(int nowH){
     if (ripVal == HIGH ){
       return true;
     }
-
+    return false;
 }
-void color (unsigned char red, unsigned char green, unsigned char blue) 
-{
-  lcd.setCursor(3,0);
+void turnOn(){
+  if (lightStatus==false){
+    lcd.backlight();
+    lightStatus =true;
+    Serial.print("turn on light");
+    ActivedTime=0;
+  }
+}
+void turnOff(){
+     if (lightStatus==true){
+      lcd.noBacklight();
+      lightStatus =false;  
+      Serial.print("turn off light");
+      ActivedTime=0;      
+   } 
+}
+void handleCmd() 
+{ 
+    if(msg[0]!='\0'){ 
+      Serial.print((char*)msg);
+      lcdCleanLine(0);
+      lcd.setCursor(0,0);
+      lcd.print(msg);
+
+      String msgString((char*)msg);
+      if (msgString == "dark"){
+          turnOff();
+      }
+      if (msgString == "light") {
+          turnOn();
+      }   
+         if (msgString == "bme") {
+          handleBME280();
+          lcd.clear(); 
+          if (lightStatus==false){
+              lcd.backlight();
+              lightStatus =true;
+              Serial.print("turn on light");
+              ActivedTime=0;
+           }
+          char line1[40];
+          char line2[40];
+          char line3[40];
+          char str_temp[7];
+          /* 4 is mininum width, 2 is precision; float value is copied onto str_temp*/
+          dtostrf(temp, 4, 2, str_temp);
+          sprintf(line1, "Temperature: %s",str_temp);
+          dtostrf(hum, 3, 2, str_temp);
+          sprintf(line2, "Humidity: %s%%",str_temp);
+          dtostrf(pres, 5, 2, str_temp);
+          sprintf(line3, "Pressure: %shPa",str_temp);
+          lcd.setCursor(0, 1);
+          lcd.print(line1);
+          lcd.write(0xdf); 
+          lcd.print("C");
+          lcd.setCursor(0, 2);
+          lcd.print(line2);
+          lcd.setCursor(0, 3);
+          lcd.print(line3);
+      }  
+      Serial2.print("received");
+      msg[0] ='\0';
+    }    
 }
 void lcdFirstLine()
 {
@@ -235,13 +267,13 @@ void lcdCleanLine(int row){
   lcd.print(emptyLine);
 }
 void setTime() {
-    if (Serial.available() >= 14)     //涓插彛璇诲彇鏁版嵁
+    if (Serial.available() >= 14)
     {
         for (int a = 0; a < 14; a++)
         {
             data[a] = Serial.read();
         }
-        Str_year[0] = data[0];    //鎷嗗寘
+        Str_year[0] = data[0];
         Str_year[1] = data[1];
         Str_month[0] = data[2];
         Str_month[1] = data[3];
@@ -257,7 +289,7 @@ void setTime() {
         Str_second[1] = data[13];
 
         //Str to byte
-        year = atoi(Str_year);    //杞崲鏁版嵁绫诲瀷
+        year = atoi(Str_year);
         month = atoi(Str_month);
         date = atoi(Str_date);
         DoW = atoi(Str_DoW);
@@ -306,8 +338,8 @@ void displayTimeTemp(bool bemStatus) {
     //Serial.print('\n');
 
     lcd.setCursor(0, 1);
-    lcd.print("20");  // 鏄剧ず20涓栫邯
-    if (year >= 10)  // 鏄剧ず骞翠唤
+    lcd.print("20");  
+    if (year >= 10)  
     {
         lcd.print(year, DEC);
     }
@@ -319,7 +351,7 @@ void displayTimeTemp(bool bemStatus) {
     lcd.print('-');
 
     lcd.setCursor(5, 1);
-    if (month >= 10)  // 鏄剧ず鏈堜唤
+    if (month >= 10) 
     {
         lcd.print(month, DEC);
     }
@@ -331,7 +363,7 @@ void displayTimeTemp(bool bemStatus) {
     lcd.print('-');
 
     lcd.setCursor(8, 1);
-    if (date >= 10)  // 鏄剧ず鏃ユ湡
+    if (date >= 10) 
     {
         lcd.print(date, DEC);
     }
@@ -342,12 +374,12 @@ void displayTimeTemp(bool bemStatus) {
     }
 
     lcd.setCursor(11, 1);
-    switch (dow)  // 鏄剧ず鏄熸湡
+    switch (dow) 
     {
-    case 1:  // 褰揹ow绛変簬1鏃讹紝鎵ц浠ヤ笅璇彞
+    case 1:  
         lcd.print("Mon");
         break;
-    case 2:  // 褰揹ow绛変簬2鏃讹紝鎵ц浠ヤ笅璇彞
+    case 2:
         lcd.print("Tue");
         break;
     case 3:
@@ -367,8 +399,8 @@ void displayTimeTemp(bool bemStatus) {
         break;
     }
 
-    lcd.setCursor(0, 2);  //鍏夋爣绉昏嚦绗�2琛�
-    if (hour >= 10)  // 鏄剧ず灏忔椂
+    lcd.setCursor(0, 2); 
+    if (hour >= 10) 
     {
         lcd.print(hour, DEC);
     }
@@ -380,7 +412,7 @@ void displayTimeTemp(bool bemStatus) {
     lcd.print(':');
 
     lcd.setCursor(3, 2);
-    if (minute >= 10)  // 鏄剧ず鍒嗛挓
+    if (minute >= 10) 
     {
         lcd.print(minute, DEC);
     }
@@ -393,7 +425,7 @@ void displayTimeTemp(bool bemStatus) {
     lcd.print(':');
 
     lcd.setCursor(6, 2);
-    if (second >= 10)  // 鏄剧ず绉掗挓
+    if (second >= 10)  
     {
         lcd.print(second, DEC);
     }
@@ -404,7 +436,7 @@ void displayTimeTemp(bool bemStatus) {
     }
     */
     lcd.setCursor(5, 2);
-    if (Clock.checkAlarmEnabled(1))  // 鏄剧ず闂归挓鏍囪瘑
+    if (Clock.checkAlarmEnabled(1))
     {
         lcd.write(0x00);
     }
