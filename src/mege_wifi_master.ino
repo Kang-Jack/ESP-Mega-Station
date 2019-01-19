@@ -176,12 +176,10 @@ void handleCmd()
         }
         //int index = msgString.indexOf("time:");
         if (msgString.startsWith("timego")){
-           Serial2.println("time-");
             for (int a = 0; a < 14; a++)
             {
                 data[a] = msg[a+6];
             }
-            Serial2.println(data);
             setDS3231();
         }
         Serial2.print("received");
@@ -263,10 +261,12 @@ void displayHumAtm(bool bemStatus)
 {
     char line3[40];
     if (bemStatus) {
+        /*
         Serial.println("hum:");
         Serial.println(hum);
         Serial.println("pres:");
         Serial.println(pres);
+        */
         sprintf(line3, "H:%i%% ATM:%ihPa", (int)hum, (int)pres);
     }
     else
@@ -280,51 +280,48 @@ void lcdCleanLine(int row) {
     lcd.print(emptyLine);
 }
 void setTime() {
-    Serial.println("time");
     if (Serial.available() >= 14)
     {
         for (int a = 0; a < 14; a++)
         {
             data[a] = Serial.read();
         }
-        Serial.println(data);
         setDS3231();
     }
 }
 
 void setDS3231(){
-        Serial.println(data);
-        Str_year[0] = data[0];
-        Str_year[1] = data[1];
-        Str_month[0] = data[2];
-        Str_month[1] = data[3];
-        Str_date[0] = data[4];
-        Str_date[1] = data[5];
-        Str_DoW[0] = data[6];
-        Str_DoW[1] = data[7];
-        Str_hour[0] = data[8];
-        Str_hour[1] = data[9];
-        Str_minute[0] = data[10];
-        Str_minute[1] = data[11];
-        Str_second[0] = data[12];
-        Str_second[1] = data[13];
+    Str_year[0] = data[0];
+    Str_year[1] = data[1];
+    Str_month[0] = data[2];
+    Str_month[1] = data[3];
+    Str_date[0] = data[4];
+    Str_date[1] = data[5];
+    Str_DoW[0] = data[6];
+    Str_DoW[1] = data[7];
+    Str_hour[0] = data[8];
+    Str_hour[1] = data[9];
+    Str_minute[0] = data[10];
+    Str_minute[1] = data[11];
+    Str_second[0] = data[12];
+    Str_second[1] = data[13];
 
-        //Str to byte
-        year = atoi(Str_year);
-        month = atoi(Str_month);
-        date = atoi(Str_date);
-        DoW = atoi(Str_DoW);
-        hour = atoi(Str_hour);
-        minute = atoi(Str_minute);
-        second = atoi(Str_second);
+    //Str to byte
+    year = atoi(Str_year);
+    month = atoi(Str_month);
+    date = atoi(Str_date);
+    DoW = atoi(Str_DoW);
+    hour = atoi(Str_hour);
+    minute = atoi(Str_minute);
+    second = atoi(Str_second);
 
-        Clock.setSecond(second);//Set the second 
-        Clock.setMinute(minute);//Set the minute 
-        Clock.setHour(hour);  //Set the hour 
-        Clock.setDoW(DoW);    //Set the day of the week
-        Clock.setDate(date);  //Set the date of the month
-        Clock.setMonth(month);  //Set the month of the year
-        Clock.setYear(year);  //Set the year (Last two digits of the year)     
+    Clock.setSecond(second);//Set the second 
+    Clock.setMinute(minute);//Set the minute 
+    Clock.setHour(hour);  //Set the hour 
+    Clock.setDoW(DoW);    //Set the day of the week
+    Clock.setDate(date);  //Set the date of the month
+    Clock.setMonth(month);  //Set the month of the year
+    Clock.setYear(year);  //Set the year (Last two digits of the year)
 }
 void displayTimeTemp(bool bemStatus) {
     lcdCleanLine(1);
