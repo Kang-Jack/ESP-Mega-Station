@@ -1,0 +1,45 @@
+{
+  "ssid": "link_tpf",
+  "password": "Laserk_0382",
+  "dhcp": true,
+  "IP": [
+    192,
+    168,
+    31,
+    1
+  ],
+  "MqttIP": [
+    192,
+    168,
+    31,
+    155
+  ],
+  "MqttPort": 1883,
+  "Netmask": [
+    255,
+    255,
+    255,
+    0
+  ],
+  "Gateway": [
+    192,
+    168,
+    31,
+    1
+  ],
+  "ntpServerName": "0.de.pool.ntp.org",
+  "Update_Time_Via_NTP_Every": 0,
+  "timezone": 8,
+  "daylight": 0,
+  "DeviceName": "ESPMega",
+  "AutoTurnOff": 0,
+  "AutoTurnOn": 0,
+  "TurnOffHour": 0,
+  "TurnOffMinute": 0,
+  "TurnOnHour": 0,
+  "TurnOnMinute": 0,
+  "ota": false,
+  "mqtt_topic": "esp/answer",
+  "mqtt_subtopic": "/data",
+  "mqtt_sub": "home/command/esp12s/mega"
+}
