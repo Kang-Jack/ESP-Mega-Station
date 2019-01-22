@@ -215,6 +215,7 @@ void ConfigureWifi()
     {
         WiFi.config(IPAddress(config.IP[0], config.IP[1], config.IP[2], config.IP[3]), IPAddress(config.Gateway[0], config.Gateway[1], config.Gateway[2], config.Gateway[3]), IPAddress(config.Netmask[0], config.Netmask[1], config.Netmask[2], config.Netmask[3]));
     }
+    needInitMQTT = true;
 }
 
 
@@ -234,11 +235,11 @@ void ReadConfig()
         Serial.println("default Conf");
 
         // DEFAULT CONFIG
-        config.ssid = "link_tpf";
-        config.password = "Laserk_0382";
+        config.ssid = "SSID";
+        config.password = "PASS";
         config.dhcp = false;
         config.IP[0] = 192; config.IP[1] = 168; config.IP[2] = 31; config.IP[3] = 1;
-        config.MqttIP[0] = 192; config.MqttIP[1] = 168; config.MqttIP[2] = 31; config.MqttIP[3] = 155;
+        config.MqttIP[0] = xxx; config.MqttIP[1] = xxx; config.MqttIP[2] = xxx; config.MqttIP[3] = xxx;
         config.MqttPort = 1883;
         config.Netmask[0] = 255; config.Netmask[1] = 255; config.Netmask[2] = 255; config.Netmask[3] = 0;
         config.Gateway[0] = 192; config.Gateway[1] = 168; config.Gateway[2] = 31; config.Gateway[3] = 1;
