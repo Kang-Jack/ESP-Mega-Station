@@ -1,18 +1,18 @@
 {
-  "ssid": "link_tpf",
-  "password": "Laserk_0382",
+  "ssid": "SSID",
+  "password": "PASS",
   "dhcp": true,
   "IP": [
     192,
     168,
-    31,
-    1
+    XXX,
+    XX
   ],
   "MqttIP": [
-    192,
-    168,
-    31,
-    155
+    XXX,
+    XXX,
+    XXX,
+    XXX
   ],
   "MqttPort": 1883,
   "Netmask": [
