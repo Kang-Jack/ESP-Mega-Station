@@ -10,11 +10,14 @@ MQTT settings:<br>
 <form action="" method="get">
 <table border="0"  cellspacing="0" cellpadding="3" style="width:310px" >
 <tr><td align="right">OTA:</td><td><input type="checkbox" id="ota" name="ota"></td></tr>
+<tr><td align="right">MqttServer:</td><td><input type="text" id="server" name="server" value=""> (local) means use ip as server </td></tr>
 <tr><td align="right">MqttIP:</td><td><input type="text" id="ip_0" name="ip_0" size="3">.<input type="text" id="ip_1" name="ip_1" size="3">.<input type="text" id="ip_2" name="ip_2" size="3">.<input type="text" id="ip_3" name="ip_3" value="" size="3"></td></tr>
 <tr><td align="right">MqttPort:</td><td><input type="text" id="port" name="port" value="" size="6"></td></tr>
+<tr><td align="right">User:</td><td><input type="text" id="user" name="user" value=""></td></tr>
+<tr><td align="right">Password:</td><td><input type="text" id="pass" name="pass" value=""></td></tr>
 <tr><td align="right">MainTopic:</td><td><input type="text" id="main_t" name="main_t" value=""></td></tr>
 <tr><td align="right">Subtopic:</td><td><input type="text" id="sub_t" name="sub_t" value=""></td></tr>
-<tr><td align="right">subscription:</td><td><input type="text" id="subs" name="subs" value=""></td></tr>
+<tr><td align="right">Subscription:</td><td><input type="text" id="subs" name="subs" value=""></td></tr>
 <tr><td colspan="2" align="center"><input type="submit" style="width:150px" class="btn btn--m btn--blue" value="Save"></td></tr>
 </table>
 </form>
@@ -64,6 +67,9 @@ void send_mqtt_configuration_html()
             if (server.argName(i) == "main_t") config.mqtt_topic = urldecode(server.arg(i));
             if (server.argName(i) == "sub_t") config.mqtt_subtopic = urldecode(server.arg(i));
             if (server.argName(i) == "subs") config.mqtt_sub = urldecode(server.arg(i));
+            if (server.argName(i) == "user") config.mqtt_user = urldecode(server.arg(i));
+            if (server.argName(i) == "pass") config.mqtt_password = urldecode(server.arg(i));
+            if (server.argName(i) == "server") config.mqtt_server_domain = urldecode(server.arg(i));
             if (server.argName(i) == "ip_0") if (checkRange(server.arg(i))) 	config.MqttIP[0] = server.arg(i).toInt();
             if (server.argName(i) == "ip_1") if (checkRange(server.arg(i))) 	config.MqttIP[1] = server.arg(i).toInt();
             if (server.argName(i) == "ip_2") if (checkRange(server.arg(i))) 	config.MqttIP[2] = server.arg(i).toInt();
@@ -96,6 +102,9 @@ void send_mqtt_configuration_values_html()
     values += "ip_2|" + (String)config.MqttIP[2] + "|input\n";
     values += "ip_3|" + (String)config.MqttIP[3] + "|input\n";
     values += "port|" + (String)config.MqttPort + "|input\n";
+    values += "user|" + (String)config.mqtt_user + "|input\n";
+    values += "pass|" + (String)config.mqtt_password + "|input\n";
+    values += "server|" + (String)config.mqtt_server_domain + "|input\n";
     values += "ota|" + (String)(config.ota ? "checked" : "") + "|chk\n";
     server.send(200, "text/plain", values);
     Serial.println(__FUNCTION__);

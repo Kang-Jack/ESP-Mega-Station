@@ -42,15 +42,15 @@ void setup(void) {
     ReadConfig();
     Serial.println("Config fetched");
 
-    sprintf(mqttCharServer, "%i.%i.%i.%i", config.MqttIP[0], config.MqttIP[1], config.MqttIP[2], config.MqttIP[3]);
-
     ConfigureWifi();
-    Set_mqtt_server(AdminEnabled);
+    //Set_mqtt_server(AdminEnabled);
 
     Setup_Pins();
     Setup_web_page();
 
-    Serial.println("HTTP server started");
+    Serial.println("WebServer started");
+    delay(500);
+    Serial.println("ESP Ver. 0.1");
     tkSecond.attach(1, Second_Tick);
     UDPNTPClient.begin(2390);  // Port for NTP receive
 
@@ -69,6 +69,7 @@ void loop(void) {
                 AdminEnabled = false;
                 WiFi.mode(WIFI_STA);
                 //ConfigureWifi();
+                Set_serverName();
                 Set_mqtt_server(AdminEnabled);
                 Serial.println("Admin disabled!");
             }
@@ -91,8 +92,6 @@ void loop(void) {
         if (Refresh)
         {
             Refresh = false;
-            ///Serial.println("Refreshing...");
-             //Serial.printf("FreeMem:%d %d:%d:%d %d.%d.%d \n",ESP.getFreeHeap() , DateTime.hour,DateTime.minute, DateTime.second, DateTime.year, DateTime.month, DateTime.day);
         }
 
     }

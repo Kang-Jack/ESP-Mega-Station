@@ -7,16 +7,36 @@
 
 WiFiClient mainESP;
 PubSubClient MQTT(mainESP);
+
 /*mqtt message */
 const int max_length = 40;
 char msg[40];
 
-char mqttCharServer[20];
+int tryTime = 10;
 
+char mqttCharServer[100];
+//char mqttCharDomain[100];
 void set_end_mark(int i) {
     if (max_length > i) msg[i] = '\0';
     else  msg[max_length - 1] = '\0';
 }
+
+void Set_serverName(){
+    //clean char array
+    memset(mqttCharServer, 0, sizeof(mqttCharServer));
+    if (config.mqtt_server_domain == "local" || config.mqtt_server_domain == "") {
+        sprintf(mqttCharServer, "%i.%i.%i.%i", config.MqttIP[0], config.MqttIP[1], config.MqttIP[2], config.MqttIP[3]);
+    }
+    else
+    {
+        // Copy this string into it
+        snprintf(mqttCharServer, sizeof(mqttCharServer) - 1, "%s", config.mqtt_server_domain.c_str());
+    }
+    // Ensure we're terminated
+    mqttCharServer[sizeof(mqttCharServer)] = '\0';
+}
+
+
 void callback(char* topic, byte* payload, unsigned int length) {
     //Serial.print(topic);
     int i = 0;
@@ -26,9 +46,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
     set_end_mark(i);
     //Serial.println();
 }
+
 void Set_mqtt_server(boolean adminEnabled) {
     if (!adminEnabled)
         if (needInitMQTT) {
+            Serial.println(mqttCharServer);
             MQTT.setServer(mqttCharServer, config.MqttPort);
             MQTT.setCallback(callback);
             needInitMQTT = false;
@@ -36,12 +58,19 @@ void Set_mqtt_server(boolean adminEnabled) {
 }
 
 void reconnect() {
-    int tryTime = 3;
     while (!MQTT.connected()) {
         if (tryTime <= 0)
             break;
-        Serial.print("MQTT connecting");
-        if (MQTT.connect(string2char(config.DeviceName))) {
+        Serial.println("MQTT connecting");
+        boolean isConnected;
+        Serial.println(config.mqtt_user.length());
+        if (config.mqtt_user.length() > 0) {
+             isConnected = MQTT.connect(string2char(config.DeviceName), string2char(config.mqtt_user), string2char(config.mqtt_password));
+         }
+        else{
+            isConnected = MQTT.connect(string2char(config.DeviceName));
+        }
+        if (isConnected) {
             Serial.println("connected MQTT");
             // Once connected, publish an announcement...
             MQTT.publish(string2char(config.mqtt_topic + config.mqtt_subtopic), "hello-ESPMega");

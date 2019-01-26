@@ -65,7 +65,9 @@ bool saveConfig() {
     json["mqtt_topic"] = config.mqtt_topic;
     json["mqtt_subtopic"] = config.mqtt_subtopic;
     json["mqtt_sub"] = config.mqtt_sub;
-
+    json["mqtt_server_domain"] = config.mqtt_server_domain;
+    json["mqtt_user"] = config.mqtt_user;
+    json["mqtt_password"] = config.mqtt_password;
     json.prettyPrintTo(Serial);
     Serial.println();
 
@@ -134,7 +136,6 @@ bool loadConfig() {
     config.Netmask[2] = maskIP[2];
     config.Netmask[3] = maskIP[3];
     config.MqttPort = json["MqttPort"];
-    config.MqttPort = 1883;
     const char* ntp = json["ntpServerName"];
     config.ntpServerName = String(ntp);
     config.Update_Time_Via_NTP_Every = json["Update_Time_Via_NTP_Every"];
@@ -153,13 +154,20 @@ bool loadConfig() {
     config.mqtt_topic = String(topic);
     const char* subtopic = json["mqtt_subtopic"];
     config.mqtt_subtopic = String(subtopic);
-
+    const char* mqtt_domain = json["mqtt_server_domain"];
+    config.mqtt_server_domain = String(mqtt_domain);
     const char* sub = json["mqtt_sub"];
     config.mqtt_sub = String(sub);
+    const char* mqttUser = json["mqtt_user"];
+    config.mqtt_user = String(mqttUser);
+    const char* mqttPassword = json["mqtt_password"];
+    config.mqtt_password = String(mqttPassword);
     Serial.print("parsing char pointers ");
     config.char_mqtt_server = string2char(IPAddress(config.MqttIP[0], config.MqttIP[1], config.MqttIP[2], config.MqttIP[3]).toString()); //MQTT Server IP
     config.char_mqtt_name = string2char(config.DeviceName); //MQTT device name
     config.char_mqtt_sub = string2char(config.mqtt_sub);
+    config.char_mqtt_user = string2char(config.mqtt_user);
+    config.char_mqtt_password = string2char(config.mqtt_password);
     Serial.print("combine");
     config.mqtt_main_topic = config.mqtt_topic + config.mqtt_subtopic;
     Serial.print(config.char_mqtt_main_topic);
@@ -238,11 +246,11 @@ void ReadConfig()
         config.ssid = "SSID";
         config.password = "PASS";
         config.dhcp = false;
-        config.IP[0] = 192; config.IP[1] = 168; config.IP[2] = 31; config.IP[3] = 1;
-        config.MqttIP[0] = xxx; config.MqttIP[1] = xxx; config.MqttIP[2] = xxx; config.MqttIP[3] = xxx;
+        config.IP[0] = 192; config.IP[1] = 168; config.IP[2] = XXX; config.IP[3] = XXX;
+        config.MqttIP[0] = XXX; config.MqttIP[1] = XXX; config.MqttIP[2] = XXX; config.MqttIP[3] = XXX;
         config.MqttPort = 1883;
         config.Netmask[0] = 255; config.Netmask[1] = 255; config.Netmask[2] = 255; config.Netmask[3] = 0;
-        config.Gateway[0] = 192; config.Gateway[1] = 168; config.Gateway[2] = 31; config.Gateway[3] = 1;
+        config.Gateway[0] = 192; config.Gateway[1] = 168; config.Gateway[2] = XXX; config.Gateway[3] = XXX;
         config.ntpServerName = "0.de.pool.ntp.org";
         config.Update_Time_Via_NTP_Every = 0;
         config.timezone = -10;
@@ -255,7 +263,10 @@ void ReadConfig()
         config.TurnOnHour = 0;
         config.TurnOnMinute = 0;
         config.ota = false;
-        config.mqtt_topic = "esp/answe";
+        config.mqtt_server_domain = "local";
+        config.mqtt_user = "";
+        config.mqtt_password = "";
+        config.mqtt_topic = "esp/answer";
         config.mqtt_subtopic = "/data";
         config.mqtt_sub = "home/command/esp12s/mega";
         WriteConfig();

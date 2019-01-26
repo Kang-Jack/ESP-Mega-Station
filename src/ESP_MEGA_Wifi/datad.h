@@ -31,13 +31,17 @@ struct strConfig {
     String mqtt_topic;
     String mqtt_subtopic;
     String mqtt_sub;
-
+    String mqtt_user;
+    String mqtt_password;
+    String mqtt_server_domain;
     char* char_mqtt_server; //MQTT Server IP
     char* char_mqtt_name; //MQTT device name
     //char* char_mqtt_topic ; //MQTT topic for communication
     //char* char_mqtt_subtopic ; //MQTT topic for communication
     char* char_mqtt_sub;
     char* char_mqtt_main_topic;
+    char* char_mqtt_user;
+    char* char_mqtt_password;
     String mqtt_main_topic;
 }   config;
 
