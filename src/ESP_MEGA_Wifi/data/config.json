@@ -1,16 +1,16 @@
 {
   "ssid": "SSID",
-  "password": "PASS",
+  "password": "PASSWORD",
   "dhcp": true,
   "IP": [
     192,
     168,
     XXX,
-    XX
+    XXX
   ],
   "MqttIP": [
-    XXX,
-    XXX,
+    192,
+    168,
     XXX,
     XXX
   ],
@@ -24,8 +24,8 @@
   "Gateway": [
     192,
     168,
-    31,
-    1
+    XXX,
+    XXX
   ],
   "ntpServerName": "0.de.pool.ntp.org",
   "Update_Time_Via_NTP_Every": 0,
@@ -41,5 +41,8 @@
   "ota": false,
   "mqtt_topic": "esp/answer",
   "mqtt_subtopic": "/data",
-  "mqtt_sub": "home/command/esp12s/mega"
+  "mqtt_sub": "home/command/esp12s/mega",
+  "mqtt_server_domain": "local",
+  "mqtt_user": "",
+  "mqtt_password": ""
 }
