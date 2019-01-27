@@ -5,7 +5,6 @@ boolean OTAEnabled = false;
 boolean AdminEnabled = true;    // Enable Admin Mode for a given Time
 boolean needInitMQTT = true;
 
-
 struct strConfig {
     String ssid;
     String password;
@@ -34,24 +33,13 @@ struct strConfig {
     String mqtt_user;
     String mqtt_password;
     String mqtt_server_domain;
-    char* char_mqtt_server; //MQTT Server IP
-    char* char_mqtt_name; //MQTT device name
-    //char* char_mqtt_topic ; //MQTT topic for communication
-    //char* char_mqtt_subtopic ; //MQTT topic for communication
-    char* char_mqtt_sub;
-    char* char_mqtt_main_topic;
-    char* char_mqtt_user;
-    char* char_mqtt_password;
-    String mqtt_main_topic;
+    String mqtt_pub_topic;
 }   config;
-
 
 static const uint8_t monthDays[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
 #define LEAP_YEAR(Y) ( ((1970+Y)>0) && !((1970+Y)%4) && ( ((1970+Y)%100) || !((1970+Y)%400) ) )
 
-
-struct  strDateTime
-{
+struct  strDateTime{
     byte hour;
     byte minute;
     byte second;

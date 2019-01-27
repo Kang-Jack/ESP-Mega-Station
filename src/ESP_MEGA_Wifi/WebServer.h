@@ -5,15 +5,15 @@
 void Setup_web_page() {
     server.on("/", processExample);
     server.on("/admin/filldynamicdata", filldynamicdata);
-    server.on("/favicon.ico", []() { Serial.println("favicon.ico"); server.send(200, "text/html", "");   });
-    server.on("/admin.html", []() { Serial.println("admin.html"); server.send(200, "text/html", PAGE_AdminMainPage);   });
+    server.on("/favicon.ico", []() {server.send(200, "text/html", "");});
+    server.on("/admin.html", []() {server.send(200, "text/html", PAGE_AdminMainPage);   });
     server.on("/config.html", send_network_configuration_html);
-    server.on("/info.html", []() { Serial.println("info.html"); server.send(200, "text/html", PAGE_Information);   });
+    server.on("/info.html", []() {server.send(200, "text/html", PAGE_Information);   });
     server.on("/ntp.html", send_NTP_configuration_html);
     server.on("/general.html", send_general_html);
     server.on("/mqttconfig.html", send_mqtt_configuration_html);
-    server.on("/style.css", []() { Serial.println("style.css"); server.send(200, "text/plain", PAGE_Style_css);  });
-    server.on("/microajax.js", []() { Serial.println("microajax.js"); server.send(200, "text/plain", PAGE_microajax_js);  });
+    server.on("/style.css", []() {server.send(200, "text/plain", PAGE_Style_css);  });
+    server.on("/microajax.js", []() {server.send(200, "text/plain", PAGE_microajax_js);  });
     server.on("/admin/values", send_network_configuration_values_html);
     server.on("/admin/connectionstate", send_connection_state_values_html);
     server.on("/admin/infovalues", send_information_values_html);

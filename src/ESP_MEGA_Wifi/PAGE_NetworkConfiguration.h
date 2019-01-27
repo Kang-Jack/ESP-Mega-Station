@@ -53,11 +53,7 @@ window.onload = function ()
 }
 function load(e,t,n){if("js"==t){var a=document.createElement("script");a.src=e,a.type="text/javascript",a.async=!1,a.onload=function(){n()},document.getElementsByTagName("head")[0].appendChild(a)}else if("css"==t){var a=document.createElement("link");a.href=e,a.rel="stylesheet",a.type="text/css",a.async=!1,a.onload=function(){n()},document.getElementsByTagName("head")[0].appendChild(a)}}
 
-
-
-
 </script>
-
 
 )=====";
 
@@ -66,14 +62,11 @@ const char PAGE_WaitAndReload[] PROGMEM = R"=====(
 Please Wait....Configuring and Restarting.
 )=====";
 
-
 //
 //  SEND HTML PAGE OR IF A FORM SUMBITTED VALUES, PROCESS THESE VALUES
 // 
 
-void send_network_configuration_html()
-{
-
+void send_network_configuration_html(){
     if (server.args() > 0)  // Save Settings
     {
         String temp = "";
@@ -105,20 +98,15 @@ void send_network_configuration_html()
     {
         server.send(200, "text/html", PAGE_NetworkConfiguration);
     }
-    Serial.println(__FUNCTION__);
+    //Serial.println(__FUNCTION__);
 }
-
-
 
 //
 //   FILL THE PAGE WITH VALUES
 //
 
-void send_network_configuration_values_html()
-{
-
+void send_network_configuration_values_html(){
     String values = "";
-
     values += "ssid|" + (String)config.ssid + "|input\n";
     values += "password|" + (String)config.password + "|input\n";
     values += "ip_0|" + (String)config.IP[0] + "|input\n";
@@ -135,18 +123,14 @@ void send_network_configuration_values_html()
     values += "gw_3|" + (String)config.Gateway[3] + "|input\n";
     values += "dhcp|" + (String)(config.dhcp ? "checked" : "") + "|chk\n";
     server.send(200, "text/plain", values);
-    Serial.println(__FUNCTION__);
-
+    //Serial.println(__FUNCTION__);
 }
-
 
 //
 //   FILL THE PAGE WITH NETWORKSTATE & NETWORKS
 //
 
-void send_connection_state_values_html()
-{
-
+void send_connection_state_values_html(){
     String state = "N/A";
     String Networks = "";
     if (WiFi.status() == 0) state = "Idle";
@@ -157,8 +141,6 @@ void send_connection_state_values_html()
     else if (WiFi.status() == 5) state = "CONNECTION LOST";
     else if (WiFi.status() == 6) state = "DISCONNECTED";
 
-
-
     int n = WiFi.scanNetworks();
 
     if (n == 0)
@@ -167,8 +149,6 @@ void send_connection_state_values_html()
     }
     else
     {
-
-
         Networks = "Found " + String(n) + " Networks<br>";
         Networks += "<table border='0' cellspacing='0' cellpadding='3'>";
         Networks += "<tr bgcolor='#DDDDDD' ><td><strong>Name</strong></td><td><strong>Quality</strong></td><td><strong>Enc</strong></td><tr>";
@@ -198,6 +178,6 @@ void send_connection_state_values_html()
     values += "connectionstate|" + state + "|div\n";
     values += "networks|" + Networks + "|div\n";
     server.send(200, "text/plain", values);
-    Serial.println(__FUNCTION__);
+    //Serial.println(__FUNCTION__);
 
 }

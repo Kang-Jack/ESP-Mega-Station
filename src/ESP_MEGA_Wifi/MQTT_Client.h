@@ -13,9 +13,8 @@ const int max_length = 40;
 char msg[40];
 
 int tryTime = 10;
-
 char mqttCharServer[100];
-//char mqttCharDomain[100];
+
 void set_end_mark(int i) {
     if (max_length > i) msg[i] = '\0';
     else  msg[max_length - 1] = '\0';
@@ -38,19 +37,16 @@ void Set_serverName(){
 
 
 void callback(char* topic, byte* payload, unsigned int length) {
-    //Serial.print(topic);
     int i = 0;
     for (i = 0; i < length; i++) {
         if (i < max_length) msg[i] = (char)payload[i];
     }
     set_end_mark(i);
-    //Serial.println();
 }
 
 void Set_mqtt_server(boolean adminEnabled) {
     if (!adminEnabled)
         if (needInitMQTT) {
-            Serial.println(mqttCharServer);
             MQTT.setServer(mqttCharServer, config.MqttPort);
             MQTT.setCallback(callback);
             needInitMQTT = false;
@@ -73,7 +69,7 @@ void reconnect() {
         if (isConnected) {
             Serial.println("connected MQTT");
             // Once connected, publish an announcement...
-            MQTT.publish(string2char(config.mqtt_topic + config.mqtt_subtopic), "hello-ESPMega");
+            MQTT.publish(string2char(config.mqtt_pub_topic), "hello-ESPMega");
             // ... and resubscribe
             MQTT.subscribe(string2char(config.mqtt_sub));
         }
@@ -94,7 +90,7 @@ void publish_msg(char* msg_str) {
         Set_mqtt_server(AdminEnabled);
     }
     if (!MQTT.connected()) reconnect();
-    MQTT.publish(string2char(config.mqtt_main_topic), msg_str);
+    MQTT.publish(string2char(config.mqtt_pub_topic), msg_str);
     delay(200);
 }
 

@@ -50,12 +50,12 @@ void setup(void) {
 
     Serial.println("WebServer started");
     delay(500);
-    Serial.println("ESP Ver. 0.1");
+    Serial.println("ESP Ver. 0.15");
     tkSecond.attach(1, Second_Tick);
     UDPNTPClient.begin(2390);  // Port for NTP receive
 
     // Start OTA server.
-    SetupOTA((const char *)config.DeviceName.c_str());
+    SetupOTA(string2char(config.DeviceName));
 }
 
 

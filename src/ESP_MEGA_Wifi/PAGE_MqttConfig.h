@@ -23,12 +23,10 @@ MQTT settings:<br>
 </form>
 <script>
 
-
 function GetState()
 {
 	setValues("/admin/mqttvalues");
 }
-
 
 window.onload = function ()
 {
@@ -42,15 +40,9 @@ window.onload = function ()
 }
 function load(e,t,n){if("js"==t){var a=document.createElement("script");a.src=e,a.type="text/javascript",a.async=!1,a.onload=function(){n()},document.getElementsByTagName("head")[0].appendChild(a)}else if("css"==t){var a=document.createElement("link");a.href=e,a.rel="stylesheet",a.type="text/css",a.async=!1,a.onload=function(){n()},document.getElementsByTagName("head")[0].appendChild(a)}}
 
-
-
-
 </script>
 
-
 )=====";
-
-
 
 //
 //  SEND HTML PAGE OR IF A FORM SUMBITTED VALUES, PROCESS THESE VALUES
@@ -77,15 +69,18 @@ void send_mqtt_configuration_html()
             if (server.argName(i) == "port") config.MqttPort = server.arg(i).toInt();
             if (server.argName(i) == "ota") config.ota = true;
         }
-        //server.send ( 200, "text/html", PAGE_WaitAndReload );
         WriteConfig();
         //firstStart = true;
         //ConfigureWifi();
         //AdminTimeOutCounter=0;
-
     }
     server.send(200, "text/html", PAGE_MQTTConfiguration);
-    Serial.println(__FUNCTION__);
+    //ConfigureWifi();
+    //Set_serverName();
+    //Set_mqtt_server(false);
+    //AdminTimeOutCounter=0;
+
+    //Serial.println(__FUNCTION__);
 }
 
 
@@ -107,5 +102,5 @@ void send_mqtt_configuration_values_html()
     values += "server|" + (String)config.mqtt_server_domain + "|input\n";
     values += "ota|" + (String)(config.ota ? "checked" : "") + "|chk\n";
     server.send(200, "text/plain", values);
-    Serial.println(__FUNCTION__);
+    //Serial.println(__FUNCTION__);
 }

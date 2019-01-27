@@ -73,7 +73,7 @@ void send_devicename_value_html()
     String values = "";
     values += "devicename|" + (String)config.DeviceName + "|div\n";
     server.send(200, "text/plain", values);
-    Serial.println(__FUNCTION__);
+    //Serial.println(__FUNCTION__);
 
 }
 
@@ -98,7 +98,7 @@ void send_general_html()
         firstStart = true;
     }
     server.send(200, "text/html", PAGE_AdminGeneralSettings);
-    Serial.println(__FUNCTION__);
+    //Serial.println(__FUNCTION__);
 
 
 }
@@ -114,5 +114,5 @@ void send_general_configuration_values_html()
     values += "toffenabled|" + (String)(config.AutoTurnOff ? "checked" : "") + "|chk\n";
     values += "tonenabled|" + (String)(config.AutoTurnOn ? "checked" : "") + "|chk\n";
     server.send(200, "text/plain", values);
-    Serial.println(__FUNCTION__);
+    //Serial.println(__FUNCTION__);
 }

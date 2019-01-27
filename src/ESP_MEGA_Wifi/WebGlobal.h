@@ -60,7 +60,6 @@ bool saveConfig() {
     json["TurnOffMinute"] = config.TurnOffMinute;
     json["TurnOnHour"] = config.TurnOnHour;
     json["TurnOnMinute"] = config.TurnOnMinute;
-
     //json["ota"] = config.ota;
     json["mqtt_topic"] = config.mqtt_topic;
     json["mqtt_subtopic"] = config.mqtt_subtopic;
@@ -69,7 +68,6 @@ bool saveConfig() {
     json["mqtt_user"] = config.mqtt_user;
     json["mqtt_password"] = config.mqtt_password;
     json.prettyPrintTo(Serial);
-    Serial.println();
 
     File configFile = SPIFFS.open("/config.json", "w");
     if (!configFile) {
@@ -162,42 +160,19 @@ bool loadConfig() {
     config.mqtt_user = String(mqttUser);
     const char* mqttPassword = json["mqtt_password"];
     config.mqtt_password = String(mqttPassword);
-    Serial.print("parsing char pointers ");
-    config.char_mqtt_server = string2char(IPAddress(config.MqttIP[0], config.MqttIP[1], config.MqttIP[2], config.MqttIP[3]).toString()); //MQTT Server IP
-    config.char_mqtt_name = string2char(config.DeviceName); //MQTT device name
-    config.char_mqtt_sub = string2char(config.mqtt_sub);
-    config.char_mqtt_user = string2char(config.mqtt_user);
-    config.char_mqtt_password = string2char(config.mqtt_password);
-    Serial.print("combine");
-    config.mqtt_main_topic = config.mqtt_topic + config.mqtt_subtopic;
-    Serial.print(config.char_mqtt_main_topic);
-    // Real world application would store these values in some variables for
-    // later use.
-
-    Serial.print("Loaded IP ");
-    Serial.println(config.ssid);
-    Serial.println(config.password);
-    Serial.println(config.IP[0]);
-    Serial.println(config.IP[1]);
-    Serial.println(config.IP[2]);
-    Serial.println(config.IP[3]);
-    Serial.println(config.MqttPort);
-    Serial.println();
+    config.mqtt_pub_topic = config.mqtt_topic + config.mqtt_subtopic;
     return true;
 }
 
 
-void ConfigureWifi()
-{
+void ConfigureWifi(){
     WiFi.disconnect();
-    if (AdminEnabled)
-    {
+    if (AdminEnabled){
         Serial.println("admin enabled");
         WiFi.mode(WIFI_AP_STA);
         WiFi.softAP(ACCESS_POINT_NAME, ACCESS_POINT_PASSWORD);
     }
-    else
-    {
+    else{
         Serial.println("admin disabled");
         WiFi.mode(WIFI_STA);
     }
@@ -217,8 +192,6 @@ void ConfigureWifi()
         delay(500);
         ESP.restart();
     }
-
-    Serial.println();
     if (!config.dhcp)
     {
         WiFi.config(IPAddress(config.IP[0], config.IP[1], config.IP[2], config.IP[3]), IPAddress(config.Gateway[0], config.Gateway[1], config.Gateway[2], config.Gateway[3]), IPAddress(config.Netmask[0], config.Netmask[1], config.Netmask[2], config.Netmask[3]));
@@ -227,21 +200,17 @@ void ConfigureWifi()
 }
 
 
-void WriteConfig()
-{
-
+void WriteConfig(){
     Serial.println("Writing Config");
     if (saveConfig())  Serial.println("Wrote Config done");
     else Serial.println("Wrote Config faild");
-
 }
-void ReadConfig()
-{
+
+void ReadConfig(){
     Serial.println("Reading Conf");
     if (loadConfig())return;
     else {
         Serial.println("default Conf");
-
         // DEFAULT CONFIG
         config.ssid = "SSID";
         config.password = "PASS";
@@ -289,8 +258,6 @@ void NTPRefresh()
     {
         IPAddress timeServerIP;
         WiFi.hostByName(config.ntpServerName.c_str(), timeServerIP);
-        //sendNTPpacket(timeServerIP); // send an NTP packet to a time server
- 
         Serial.println("sending NTP packet...");
         memset(packetBuffer, 0, NTP_PACKET_SIZE);
         packetBuffer[0] = 0b11100011;   // LI, Version, Mode

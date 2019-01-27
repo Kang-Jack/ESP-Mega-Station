@@ -69,11 +69,7 @@ function load(e,t,n){if("js"==t){var a=document.createElement("script");a.src=e,
 </script>
 )=====";
 
-
-void send_NTP_configuration_html()
-{
-
-
+void send_NTP_configuration_html(){
     if (server.args() > 0)  // Save Settings
     {
         config.daylight = false;
@@ -88,24 +84,16 @@ void send_NTP_configuration_html()
         firstStart = true;
     }
     server.send(200, "text/html", PAGE_NTPConfiguration);
-    Serial.println(__FUNCTION__);
+    //Serial.println(__FUNCTION__);
 
 }
 
-
-
-
-
-
-void send_NTP_configuration_values_html()
-{
-
+void send_NTP_configuration_values_html(){
     String values = "";
     values += "ntpserver|" + (String)config.ntpServerName + "|input\n";
     values += "update|" + (String)config.Update_Time_Via_NTP_Every + "|input\n";
     values += "tz|" + (String)config.timezone + "|input\n";
     values += "dst|" + (String)(config.daylight ? "checked" : "") + "|chk\n";
     server.send(200, "text/plain", values);
-    Serial.println(__FUNCTION__);
-
+    //Serial.println(__FUNCTION__);
 }

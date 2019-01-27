@@ -85,10 +85,7 @@ void ConvertUnixTimeStamp(unsigned long TimeStamp, struct strDateTime* DateTime)
 
 }
 
-
-
-String GetMacAddress()
-{
+String GetMacAddress(){
     uint8_t mac[6];
     char macStr[18] = { 0 };
     WiFi.macAddress(mac);
@@ -97,8 +94,7 @@ String GetMacAddress()
 }
 
 // convert a single hex digit character to its integer value (from https://code.google.com/p/avr-netino/)
-unsigned char h2int(char c)
-{
+unsigned char h2int(char c){
     if (c >= '0' && c <= '9') {
         return((unsigned char)c - '0');
     }
