@@ -75,11 +75,6 @@ void send_mqtt_configuration_html()
         //AdminTimeOutCounter=0;
     }
     server.send(200, "text/html", PAGE_MQTTConfiguration);
-    //ConfigureWifi();
-    //Set_serverName();
-    //Set_mqtt_server(false);
-    //AdminTimeOutCounter=0;
-
     //Serial.println(__FUNCTION__);
 }
 

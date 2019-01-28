@@ -3,7 +3,6 @@
 int AdminTimeOutCounter = 0;                  // Counter for Disabling the AdminMode
 boolean OTAEnabled = false;
 boolean AdminEnabled = true;    // Enable Admin Mode for a given Time
-boolean needInitMQTT = true;
 
 struct strConfig {
     String ssid;

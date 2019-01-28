@@ -196,14 +196,13 @@ void ConfigureWifi(){
     {
         WiFi.config(IPAddress(config.IP[0], config.IP[1], config.IP[2], config.IP[3]), IPAddress(config.Gateway[0], config.Gateway[1], config.Gateway[2], config.Gateway[3]), IPAddress(config.Netmask[0], config.Netmask[1], config.Netmask[2], config.Netmask[3]));
     }
-    needInitMQTT = true;
 }
 
 
 void WriteConfig(){
-    Serial.println("Writing Config");
-    if (saveConfig())  Serial.println("Wrote Config done");
-    else Serial.println("Wrote Config faild");
+    Serial.println("Writing Conf");
+    if (saveConfig()) { Serial.println("Wrote Config done"); }
+    else { Serial.println("Wrote Config faild"); }
 }
 
 void ReadConfig(){
@@ -300,7 +299,7 @@ void Second_Tick() {
     cNTP_Update++;
     UnixTimestamp++;
     ConvertUnixTimeStamp(UnixTimestamp + (config.timezone * 360), &tempDateTime);
-    if (config.daylight) // Sommerzeit beachten
+    if (config.daylight)
         if (summertime(tempDateTime.year, tempDateTime.month, tempDateTime.day, tempDateTime.hour, 0))
         {
             ConvertUnixTimeStamp(UnixTimestamp + (config.timezone * 360) + 3600, &DateTime);

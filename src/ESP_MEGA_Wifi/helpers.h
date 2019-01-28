@@ -43,8 +43,8 @@ void ConvertUnixTimeStamp(unsigned long TimeStamp, struct strDateTime* DateTime)
     time /= 60; // now it is hours
     DateTime->hour = time % 24;
     time /= 24; // now it is days
-    DateTime->wday = ((time + 4) % 7) + 1;  // Sunday is day 1 
-
+    DateTime->wday = ((time + 4) % 7);
+    if (DateTime->wday == 0) DateTime->wday = 7;  // Sunday is day 7 
     year = 0;
     days = 0;
     while ((unsigned)(days += (LEAP_YEAR(year) ? 366 : 365)) <= time) {

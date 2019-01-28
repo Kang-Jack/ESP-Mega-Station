@@ -27,7 +27,7 @@ Include the HTML, STYLE and Script "Pages"
 #include "PAGE_NetworkConfiguration.h"
 #include "PAGE_MqttConfig.h"
 #include "example.h"
-
+#include "Mega.h"
 #include "WebServer.h"
 
 #define AdminTimeOut 300 // Defines the Time in Seconds, when the Admin-Mode will be diabled
@@ -43,14 +43,13 @@ void setup(void) {
     Serial.println("Config fetched");
 
     ConfigureWifi();
-    //Set_mqtt_server(AdminEnabled);
 
     Setup_Pins();
     Setup_web_page();
 
     Serial.println("WebServer started");
     delay(500);
-    Serial.println("ESP Ver. 0.15");
+    Serial.println("ESP Ver. 0.17.1");
     tkSecond.attach(1, Second_Tick);
     UDPNTPClient.begin(2390);  // Port for NTP receive
 
@@ -68,10 +67,10 @@ void loop(void) {
             {
                 AdminEnabled = false;
                 WiFi.mode(WIFI_STA);
-                //ConfigureWifi();
                 Set_serverName();
                 Set_mqtt_server(AdminEnabled);
                 Serial.println("Admin disabled!");
+                SyncWithValidNPT();
             }
         }
 

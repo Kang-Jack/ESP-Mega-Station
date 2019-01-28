@@ -45,18 +45,20 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 void Set_mqtt_server(boolean adminEnabled) {
-    if (!adminEnabled)
-        if (needInitMQTT) {
+    if (!adminEnabled){
             MQTT.setServer(mqttCharServer, config.MqttPort);
             MQTT.setCallback(callback);
-            needInitMQTT = false;
         }
 }
 
 void reconnect() {
     while (!MQTT.connected()) {
-        if (tryTime <= 0)
+        if (tryTime <= 0){
+            if (tryTime == 0) {
+                Serial.println("No MQTT Server");
+            }
             break;
+        }
         Serial.println("MQTT connecting");
         boolean isConnected;
         Serial.println(config.mqtt_user.length());
@@ -89,7 +91,10 @@ void publish_msg(char* msg_str) {
         ConfigureWifi();
         Set_mqtt_server(AdminEnabled);
     }
-    if (!MQTT.connected()) reconnect();
+    if (!MQTT.connected()) {
+        Set_mqtt_server(true);
+        reconnect();
+    }
     MQTT.publish(string2char(config.mqtt_pub_topic), msg_str);
     delay(200);
 }
@@ -139,7 +144,10 @@ void Handle_mqtt() {
     }
     talk_master();
     listen_master();
-    if (!MQTT.connected()) reconnect();
+    if (!MQTT.connected()) {
+        Set_mqtt_server(true);
+        reconnect();
+    }
     MQTT.loop();
     delay(200);
 }
