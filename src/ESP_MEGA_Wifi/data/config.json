@@ -27,7 +27,7 @@
     XXX,
     XXX
   ],
-  "ntpServerName": "0.de.pool.ntp.org",
+  "ntpServerName": "cn.pool.ntp.org",
   "Update_Time_Via_NTP_Every": 0,
   "timezone": 8,
   "daylight": 0,
