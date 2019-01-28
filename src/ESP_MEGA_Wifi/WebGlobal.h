@@ -220,7 +220,7 @@ void ReadConfig(){
         config.MqttPort = 1883;
         config.Netmask[0] = 255; config.Netmask[1] = 255; config.Netmask[2] = 255; config.Netmask[3] = 0;
         config.Gateway[0] = 192; config.Gateway[1] = 168; config.Gateway[2] = XXX; config.Gateway[3] = XXX;
-        config.ntpServerName = "0.de.pool.ntp.org";
+        config.ntpServerName = "cn.pool.ntp.org";
         config.Update_Time_Via_NTP_Every = 0;
         config.timezone = -10;
         config.daylight = true;
