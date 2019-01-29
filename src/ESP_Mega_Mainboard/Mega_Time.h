@@ -17,10 +17,10 @@ char Str_year[3], Str_month[3], Str_date[3], Str_DoW[3], Str_hour[3], Str_minute
 int ActivedTime = 0;
 
 int getNowSeconds() {
-    Clock.getSecond();
+    return Clock.getSecond();
 }
 int getNowHour() {
-    Clock.getHour(h12, PM);
+    return Clock.getHour(h12, PM);
 }
 void printTimeFormat() {
     Serial.println("Please enter the time: year[2]month[2]date[2]DoW[2]hour[2]minute[2]second[2]");
