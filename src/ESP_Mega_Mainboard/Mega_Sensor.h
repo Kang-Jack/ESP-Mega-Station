@@ -1,6 +1,9 @@
 #ifndef MEGA_Sensor
 #define MEGA_Sensor
 
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+
 Adafruit_BME280 bme; // I2C
 bool bmeStatus = false;
 
