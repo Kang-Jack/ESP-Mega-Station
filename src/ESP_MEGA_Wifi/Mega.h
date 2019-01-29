@@ -11,7 +11,7 @@ void SyncWithValidNPT() {
             int int_Y = DateTime.year - 2000;
             sprintf(timego, "%s%i%02u%02u%02u%02u%02u%02u", time_cmd.c_str(), int_Y, DateTime.month, DateTime.day, DateTime.wday, DateTime.hour, DateTime.minute, DateTime.second);
             Serial.println(timego);
-            isTimeSynced = false;
+            needSyncTime = false;
             delay(3000);
         }
 }
