@@ -70,19 +70,17 @@ void loop(void) {
                 Set_serverName();
                 Set_mqtt_server(AdminEnabled);
                 Serial.println("Admin disabled!");
-                SyncWithValidNPT();
             }
+            // sync time setting at beginning 
+            Handle_NTP();
+            SyncWithValidNPT();
         }
 
-        Handle_NTP();
-
-        Handle_auto_switch();
+        //Handle_auto_switch();
 
         server.handleClient();
 
-        /*
-        *    Your Code here
-        */
+        // mqtt communication
         if (!AdminEnabled)
         {
             Handle_mqtt();

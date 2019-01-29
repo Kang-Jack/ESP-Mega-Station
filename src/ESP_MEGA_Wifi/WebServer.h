@@ -57,7 +57,6 @@ void Handle_auto_switch() {
             }
         }
 
-
         Minute_Old = DateTime.minute;
         if (config.AutoTurnOff)
         {

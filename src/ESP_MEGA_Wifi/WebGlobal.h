@@ -177,8 +177,6 @@ void ConfigureWifi(){
         WiFi.mode(WIFI_STA);
     }
     Serial.println("Configuring Wifi");
-    Serial.println(config.ssid);
-    Serial.println(config.password);
     WiFi.begin(config.ssid.c_str(), config.password.c_str());
     // ... Give ESP 10 seconds to connect to station.
     unsigned long startTime = millis();
@@ -280,8 +278,7 @@ void NTPRefresh()
         }
         else
         {
-            Serial.print("NTP received,len=");
-            Serial.println(cb);
+            Serial.println("NTP received");
             UDPNTPClient.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
             unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
             unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
