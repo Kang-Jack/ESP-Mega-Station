@@ -44,18 +44,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
     set_end_mark(i);
 }
 
-void Set_mqtt_server(boolean adminEnabled) {
-    if (!adminEnabled){
-            MQTT.setServer(mqttCharServer, config.MqttPort);
-            MQTT.setCallback(callback);
-        }
+void Set_mqtt_server() {
+    MQTT.setServer(mqttCharServer, config.MqttPort);
+    MQTT.setCallback(callback);
 }
 
 void reconnect() {
     while (!MQTT.connected()) {
         if (tryTime <= 0){
             if (tryTime == 0) {
-                Serial.println("No MQTT Server");
+                Serial.print("No MQTT : ");
+                Serial.println(WiFi.status());
+                tryTime--;
             }
             break;
         }
@@ -63,13 +63,14 @@ void reconnect() {
         boolean isConnected;
         Serial.println(config.mqtt_user.length());
         if (config.mqtt_user.length() > 0) {
-             isConnected = MQTT.connect(string2char(config.DeviceName), string2char(config.mqtt_user), string2char(config.mqtt_password));
+            isConnected = MQTT.connect(string2char(config.DeviceName), string2char(config.mqtt_user), string2char(config.mqtt_password));
          }
         else{
             isConnected = MQTT.connect(string2char(config.DeviceName));
         }
         if (isConnected) {
             Serial.println("connected MQTT");
+            tryTime = 0;
             // Once connected, publish an announcement...
             MQTT.publish(string2char(config.mqtt_pub_topic), "hello-ESPMega");
             // ... and resubscribe
@@ -82,17 +83,16 @@ void reconnect() {
                 delay(1);
             }
         }
-        tryTime = tryTime - 1;
+        tryTime--;
     }
 }
 
 void publish_msg(char* msg_str) {
     if (WiFi.status() != WL_CONNECTED) {
         ConfigureWifi();
-        Set_mqtt_server(AdminEnabled);
+        Set_mqtt_server();
     }
     if (!MQTT.connected()) {
-        Set_mqtt_server(true);
         reconnect();
     }
     MQTT.publish(string2char(config.mqtt_pub_topic), msg_str);
@@ -119,7 +119,7 @@ void listen_master() {
     else {
         if (WiFi.status() != WL_CONNECTED) {
             ConfigureWifi();
-            Set_mqtt_server(AdminEnabled);
+            Set_mqtt_server();
         }
         publish_msg((char*)msg);
         msg[0] = '\0';
@@ -140,12 +140,12 @@ void Setup_Pins() {
 void Handle_mqtt() {
     if (WiFi.status() != WL_CONNECTED) {
         ConfigureWifi();
-        Set_mqtt_server(AdminEnabled);
+        Set_mqtt_server();
     }
     talk_master();
     listen_master();
     if (!MQTT.connected()) {
-        Set_mqtt_server(true);
+        Set_mqtt_server();
         reconnect();
     }
     MQTT.loop();
