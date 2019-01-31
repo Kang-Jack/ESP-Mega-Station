@@ -45,6 +45,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 void Set_mqtt_server() {
+    Set_serverName();
     MQTT.setServer(mqttCharServer, config.MqttPort);
     MQTT.setCallback(callback);
 }
@@ -61,7 +62,6 @@ void reconnect() {
         }
         Serial.println("MQTT connecting");
         boolean isConnected;
-        Serial.println(config.mqtt_user.length());
         if (config.mqtt_user.length() > 0) {
             isConnected = MQTT.connect(string2char(config.DeviceName), string2char(config.mqtt_user), string2char(config.mqtt_password));
          }
@@ -145,7 +145,6 @@ void Handle_mqtt() {
     talk_master();
     listen_master();
     if (!MQTT.connected()) {
-        Set_mqtt_server();
         reconnect();
     }
     MQTT.loop();
