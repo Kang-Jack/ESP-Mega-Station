@@ -67,7 +67,6 @@ void loop(void) {
             {
                 AdminEnabled = false;
                 WiFi.mode(WIFI_STA);
-                Set_serverName();
                 Set_mqtt_server();
                 Serial.println("Admin disabled!");
             }
