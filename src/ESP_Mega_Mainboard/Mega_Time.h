@@ -22,6 +22,9 @@ int getNowSeconds() {
 int getNowHour() {
     return Clock.getHour(h12, PM);
 }
+int getNowMinute() {
+    return Clock.getMinute();
+}
 void printTimeFormat() {
     Serial.println("Please enter the time: year[2]month[2]date[2]DoW[2]hour[2]minute[2]second[2]");
     Serial.println("example: 2014-12-3 Wednesday 14:15:15 enter:14120303141515");

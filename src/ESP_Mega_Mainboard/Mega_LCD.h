@@ -44,9 +44,45 @@ void lcdFirstLine()
         lcd.print("Esp12 connected");
     }
 }
+void  lcdPMSInfo(){
+    lcdCleanLine(0);
+    lcdCleanLine(1);
+    lcdCleanLine(2);
+    lcdCleanLine(3);
+    if (lightStatus == false) {
+        lcd.backlight();
+        lightStatus = true;
+        Serial.print("turn on light");
+        ActivedTime = 0;
+    }
+    char line0[40];
+    char line1[40];
+    char line2[40];
+    char line3[40];
+    char str_temp[7];
+    /* 4 is mininum width, 2 is precision; float value is copied onto str_temp*/
+    sprintf(line0, "AQI:%i %s", aqi, aqiString);
+    Serial.println("string");
+    Serial.println(aqiString);
+    dtostrf(pmsForm, 4, 4, str_temp);
+    sprintf(line1, "HCHO:%s PM2.5:%i" , str_temp,pmsAto2_5);
+    sprintf(line2, "PM10:%i PM1.0:%i ", pmsAto10, pmsAto1);
+    sprintf(line3, "PM:ug/m3 HCHO:mg/m3");
+    lcd.setCursor(0, 0);
+    lcd.print(line0);
+    lcd.setCursor(0, 1);
+    lcd.print(line1);
+    lcd.setCursor(0, 2);
+    lcd.print(line2);
+    lcd.setCursor(0, 3);
+    lcd.print(line3);
+
+}
 
 void lcdBMEInfo() {
-    lcd.clear();
+    lcdCleanLine(1);
+    lcdCleanLine(2);
+    lcdCleanLine(3);
     if (lightStatus == false) {
         lcd.backlight();
         lightStatus = true;

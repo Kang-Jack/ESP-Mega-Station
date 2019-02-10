@@ -26,6 +26,10 @@ void handleESPCmd()
             handleBME280();
             lcdBMEInfo();
         }
+        if (msgString == "pms") {
+            handlePMS5003S(0);
+            lcdPMSInfo();
+        }
         //int index = msgString.indexOf("time:");
         if (msgString.startsWith("timego")) {
             for (int a = 0; a < 14; a++)
@@ -42,14 +46,26 @@ void handleESPCmd()
 void majorWorkOnCondition() {
     int nowSeconds = getNowSeconds();
     int nowHour = getNowHour();
+    int nowMins = getNowMinute();
     bool isNeedLight = needLightOn(nowHour);
     handleLight(nowSeconds, nowHour, isNeedLight);
     if (isWorkingTime(nowHour)) {
         if (nowSeconds % 60 == 0)
         {
+            Serial.println("time");
+            Serial.println(nowSeconds);
+
             handleBME280();
             lcdHumAtm(bmeStatus);
             lcdTimeTemp(bmeStatus);
+
+        }
+        handlePMS5003S(nowMins);
+        if (nowSeconds % 60 == 30)
+        {
+            Serial.println("pms");
+            Serial.println(nowSeconds);
+            lcdPMSInfo();
         }
     }
 }

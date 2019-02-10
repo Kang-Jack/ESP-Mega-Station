@@ -5,11 +5,13 @@
 #include "Mega_LCD.h"
 #include "Mega_ESP.h"
 #include "Mega_Sensor.h"
+#include "Mega_PMS5003S.h"
 #include "Mega_CMD.h"
 
 void setup()
 {
     setupSensor();
+    setupPMS5003S();
     setupLcd();
     Serial.begin(9600);
     Serial2.begin(115200);
