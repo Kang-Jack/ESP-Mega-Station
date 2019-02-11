@@ -9,7 +9,7 @@ unsigned pmsAto1;
 float pmsForm;
 int aqi;
 char aqiString[10];
-
+char aqiTime[6];
 const int max_length = 40;
 char msg[max_length];   // initialise storage buffer (i haven't tested to this capacity.)
 

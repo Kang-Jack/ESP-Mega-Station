@@ -27,7 +27,7 @@ void handleESPCmd()
             lcdBMEInfo();
         }
         if (msgString == "pms") {
-            handlePMS5003S(0);
+            handlePMS5003S(0,0);
             lcdPMSInfo();
         }
         //int index = msgString.indexOf("time:");
@@ -52,19 +52,18 @@ void majorWorkOnCondition() {
     if (isWorkingTime(nowHour)) {
         if (nowSeconds % 60 == 0)
         {
-            Serial.println("time");
-            Serial.println(nowSeconds);
-
+            //Serial.println("time");
+            //Serial.println(nowSeconds);
             handleBME280();
             lcdHumAtm(bmeStatus);
             lcdTimeTemp(bmeStatus);
 
         }
-        handlePMS5003S(nowMins);
+        handlePMS5003S(nowMins, nowHour);
         if (nowSeconds % 60 == 30)
         {
-            Serial.println("pms");
-            Serial.println(nowSeconds);
+            //Serial.println("pms");
+            //Serial.println(nowSeconds);
             lcdPMSInfo();
         }
     }

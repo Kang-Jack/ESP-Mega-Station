@@ -79,6 +79,7 @@ private:
   Stream *Seri;
   unsigned int LRC = 0;
   void send(byte,byte,byte);
+  void parseG5s(unsigned char ucData);
 };
 
 #endif

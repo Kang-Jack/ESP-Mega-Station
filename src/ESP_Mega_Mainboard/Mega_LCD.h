@@ -60,14 +60,15 @@ void  lcdPMSInfo(){
     char line2[40];
     char line3[40];
     char str_temp[7];
-    /* 4 is mininum width, 2 is precision; float value is copied onto str_temp*/
-    sprintf(line0, "AQI:%i %s", aqi, aqiString);
-    Serial.println("string");
-    Serial.println(aqiString);
-    dtostrf(pmsForm, 4, 4, str_temp);
+
+    sprintf(line0, " AQI:%i %s", aqi, aqiString);
+    //Serial.println("string");
+    //Serial.println(aqiString);
+    /* 4 is mininum width, 3 is precision; float value is copied onto str_temp*/
+    dtostrf(pmsForm, 4, 3, str_temp);
     sprintf(line1, "HCHO:%s PM2.5:%i" , str_temp,pmsAto2_5);
-    sprintf(line2, "PM10:%i PM1.0:%i ", pmsAto10, pmsAto1);
-    sprintf(line3, "PM:ug/m3 HCHO:mg/m3");
+    sprintf(line2, "PM10:%i PM1.0:%i", pmsAto10, pmsAto1);
+    sprintf(line3, "mg/m3 ug/m3 %s", aqiTime);
     lcd.setCursor(0, 0);
     lcd.print(line0);
     lcd.setCursor(0, 1);

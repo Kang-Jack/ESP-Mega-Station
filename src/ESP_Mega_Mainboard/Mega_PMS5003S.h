@@ -5,7 +5,8 @@
 int WakeMins = 0;
 bool isWake = false;
 bool isActive = false;
-
+int lastM = 0;
+int lastH = 0;
 LASERK_PMS5003S pms(&Serial3);
 
 /*
@@ -72,12 +73,9 @@ double chn_pm10_category[7][4] = { {0.0, 50, 0, 50}, {50.1, 150, 51, 100},
                      {150.1, 250, 101, 150}, {250.1, 350, 151, 200},
                      {350.1, 420, 201, 300}, {420.1, 500, 301, 400}, {500.1, 600, 401, 500} };
 
-int pmsResetPin = 9;
-
 double caculator(const double* match_category,int iaqi) {
     return (match_category[3] - match_category[2]) / (match_category[1] - match_category[0])*(iaqi - match_category[0]) + match_category[2];
 }
-
 
 int us_pm2_5_aqi_caculator(int pm2_5_iaqi) {
     //clean char array
@@ -115,6 +113,43 @@ int us_pm2_5_aqi_caculator(int pm2_5_iaqi) {
         return caculator(us_pm2_5_category[6], pm2_5_iaqi);
     }
 }
+
+int us_pm10_aqi_caculator(int pm10_iaqi) {
+    //clean char array
+    memset(aqiString, 0, sizeof(aqiString));
+    if (pm10_iaqi < us_pm10_category[0][1]) {
+        snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Good");
+        return caculator(us_pm10_category[0], pm10_iaqi);
+    }
+    if (pm10_iaqi < us_pm10_category[1][1]) {
+        snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Lightly");
+        return caculator(us_pm10_category[1], pm10_iaqi);
+    }
+    if (pm10_iaqi < us_pm10_category[2][1]) {
+        snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Moderately");
+        return caculator(us_pm10_category[2], pm10_iaqi);
+    }
+    if (pm10_iaqi < us_pm10_category[3][1]) {
+        snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Unhealthy");
+        return caculator(us_pm10_category[3], pm10_iaqi);
+    }
+    if (pm10_iaqi < us_pm10_category[4][1]) {
+        snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Heavily");
+        return caculator(us_pm10_category[4], pm10_iaqi);
+    }
+    if (pm10_iaqi < us_pm10_category[5][1]) {
+        snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Hazardous");
+        return caculator(us_pm10_category[5], pm10_iaqi);
+    }
+    if (pm10_iaqi < us_pm10_category[6][1]) {
+        snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Severely");
+        return caculator(us_pm10_category[6], pm10_iaqi);
+    }
+    else {
+        snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Severely");
+        return caculator(us_pm10_category[6], pm10_iaqi);
+    }
+}
     /*
         @staticmethod
         def us_pm10_aqi_caculator(pm10_iaqi) :
@@ -140,9 +175,9 @@ int us_pm2_5_aqi_caculator(int pm2_5_iaqi) {
 
 void setupPMS5003S(){
     Serial3.begin(9600);
-    pinMode(pmsResetPin, OUTPUT);
     pms.begin();
-    pms.setMode(ACTIVE);
+    //pms.setMode(ACTIVE);
+    pms.setMode(PASSIVE);
     pms.wakeUp();
     delay(500);
     isWake = true;
@@ -162,34 +197,52 @@ void sleep(int pms_mins) {
     delay(500);
     WakeMins = pms_mins;
 }
-void handlePMS5003S(int pms_mins,int pms_hour){
+void logPMS(int aqi2_5,int aqi10) {
+    char logMesg[100];
+    char str_temp[7];
+    dtostrf(pmsForm, 4, 4, str_temp);
+    sprintf(logMesg, "(%s) HCHO:%s AQI2_5:%i AQI10:%i Level:%s: PM2.5:%i PM10:%i PM1.0:%i", aqiTime, str_temp, aqi2_5, aqi10, aqiString, pmsAto2_5, pmsAto10, pmsAto1);
+    logging2SD(logMesg);
+}
+void handlePMS5003S(int pms_min,int pms_hour){
     if (WakeMins == 0 && isWake == true){
-        WakeMins = pms_mins;
+        WakeMins = pms_min;
     }
     else {
-        if (pms_mins - WakeMins > 10 && isWake == true) {
-            sleep(pms_mins);
+        if (pms_min - WakeMins > 10 && isWake == true) {
+            sleep(pms_min);
         }
-        else if (pms_mins == 0 && isWake == false) {
-            wake(pms_mins);
+        else if (pms_min == 0 && isWake == false) {
+            wake(pms_min);
         }
     }
 
     if (isWake){
-              //pms.request();
+          pms.request();
           if(!pms.read()){
             return;
           }
-
+          sprintf(aqiTime, "%i:%i\0", pms_hour, pms_min);
           pmsAto1 = pms.getPmAto(1.0);
           pmsAto2_5 = pms.getPmAto(2.5);
-          pmsAto10 = pms.getPmAto(10);
+          pmsAto10 = pms.getPmAto(10.0);
           pmsForm = pms.getForm();
-          aqi = us_pm2_5_aqi_caculator(pmsAto2_5);
+          int aqi2_5;
+          int aqi10;
+          aqi2_5 = us_pm2_5_aqi_caculator(pmsAto2_5);
+          aqi10 = us_pm10_aqi_caculator(pmsAto10);
+          // aqi = Max {aqi2_5,aqi10}
+          if(aqi2_5 >= aqi10)
+              aqi = us_pm2_5_aqi_caculator(pmsAto2_5);
+          else
+              aqi = us_pm10_aqi_caculator(pmsAto10);
+
+          if (lastH != pms_hour || lastM != pms_min) {
+              lastH = pms_hour;
+              lastM = pms_min;
+              logPMS(aqi2_5, aqi10);
+          }
     }
 }
-
-
-
 
 #endif

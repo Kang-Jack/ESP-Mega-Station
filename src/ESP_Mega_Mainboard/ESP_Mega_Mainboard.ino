@@ -1,6 +1,7 @@
 #include <Wire.h> 
 
 #include "datad.h"
+#include "MEGA_Logger.h"
 #include "MEGA_Time.h"
 #include "Mega_LCD.h"
 #include "Mega_ESP.h"
@@ -9,7 +10,8 @@
 #include "Mega_CMD.h"
 
 void setup()
-{
+{   
+    setupLogger();
     setupSensor();
     setupPMS5003S();
     setupLcd();

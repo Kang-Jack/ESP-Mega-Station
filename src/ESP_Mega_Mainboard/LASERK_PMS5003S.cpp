@@ -1,4 +1,4 @@
-#include "LASERK_PMS5003S.h"
+﻿#include "LASERK_PMS5003S.h"
 
 LASERK_PMS5003S::LASERK_PMS5003S(SoftwareSerial *serial){
   sofSeri = serial;
@@ -47,7 +47,41 @@ void LASERK_PMS5003S::setMode(byte mode){
 void LASERK_PMS5003S::request(){
   send(PMS_CMD_READ,0x00,0x00);
 }
+void LASERK_PMS5003S::parseG5s(unsigned char ucData)
+{
+    static unsigned int ucRxBuffer[250];
+    static unsigned int ucRxCnt = 0;
+    ucRxBuffer[ucRxCnt++] = ucData;
+    if (ucRxBuffer[0] != 0x42 && ucRxBuffer[1] != 0x4D)
+    {
+        ucRxCnt = 0;
+        return;
+    }
+    if (ucRxCnt > 32)//G5S-32，G5ST -38
+    {
+        data[DATA_PM10CF1] = (int)ucRxBuffer[4] * 256 + (int)ucRxBuffer[5];
+        data[DATA_PM25CF1] = (int)ucRxBuffer[6] * 256 + (int)ucRxBuffer[7];
+        data[DATA_PM100CF1] = (int)ucRxBuffer[8] * 256 + (int)ucRxBuffer[9];
+        data[DATA_PM10ATO] = (int)ucRxBuffer[10] * 256 + (int)ucRxBuffer[11];
+        data[DATA_PM25ATO] = (int)ucRxBuffer[12] * 256 + (int)ucRxBuffer[13];
+        data[DATA_PM100ATO] = (int)ucRxBuffer[14] * 256 + (int)ucRxBuffer[15];
+        data[DATA_PCS03ug] = (int)ucRxBuffer[16] * 256 + (int)ucRxBuffer[17];
+        data[DATA_PCS05ug] = (int)ucRxBuffer[18] * 256 + (int)ucRxBuffer[19];
+        data[DATA_PCS10ug] = (int)ucRxBuffer[20] * 256 + (int)ucRxBuffer[21];
+        data[DATA_PCS25ug] = (int)ucRxBuffer[22] * 256 + (int)ucRxBuffer[23];
+        data[DATA_PCS50ug] = (int)ucRxBuffer[24] * 256 + (int)ucRxBuffer[25];
+        data[DATA_PCS100ug] = (int)ucRxBuffer[26] * 256 + (int)ucRxBuffer[27];
+        data[DATA_FORMALDE] = ((int)ucRxBuffer[28] * 256 + (int)ucRxBuffer[29]);
+        if (data[DATA_PM25CF1] > 999)
+        {
+            ucRxCnt = 0;
+            return;
+        }
+        ucRxCnt = 0;
+        return;
+    }
 
+}
 int LASERK_PMS5003S::read(unsigned long timeout){
   static unsigned long start;
   static int cnt;
@@ -56,30 +90,30 @@ int LASERK_PMS5003S::read(unsigned long timeout){
   check = 0;
   start = millis();
   while(Seri->available() < 32){
-     hwSeri->println("timeout false");
      if(millis() - start > timeout){return false;}
   }
   while(Seri->available() > 0){
-    byte c = Seri->read();
+    /*byte c = Seri->read();
     buffer[31-(cnt)] = c;
     if(cnt < 30){
       check += (unsigned int)c;
     }
     cnt++;
-    cnt = cnt % 32;
+    cnt = cnt % 32;*/
+    parseG5s(Seri->read());
   }
-
-  if(reinterpret_cast<unsigned int *> (buffer)[15] != 0x424D ||
+  if (data[DATA_PM25CF1] > 999)
+      return false;
+  /*if(reinterpret_cast<unsigned int *> (buffer)[15] != 0x424D ||
       reinterpret_cast<unsigned int *> (buffer)[0] != check){
-      hwSeri->println("return false 2");
     return false;
   }
-  memcpy(data,buffer,sizeof(buffer));
+  memcpy(data,buffer,sizeof(buffer));*/
   return true;
 }
 
 double LASERK_PMS5003S::getForm(){
-  return data[DATA_FORMALDE]/1000.0;
+  return data[DATA_FORMALDE] / 1000.000;
 }
 
 unsigned int LASERK_PMS5003S::getPcs(double pcs){
