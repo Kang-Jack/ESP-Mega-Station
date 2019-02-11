@@ -30,6 +30,14 @@ void handleESPCmd()
             handlePMS5003S(0,0);
             lcdPMSInfo();
         }
+        if (msgString == "disable_log") {
+            disableLogger();
+            lcdCmdEcho("log disabled");
+        }
+        if (msgString == "enable_log") {
+            enableLogger();
+            lcdCmdEcho("log enabled");
+        }
         //int index = msgString.indexOf("time:");
         if (msgString.startsWith("timego")) {
             for (int a = 0; a < 14; a++)

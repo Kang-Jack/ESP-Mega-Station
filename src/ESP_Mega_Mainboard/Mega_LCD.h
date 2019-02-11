@@ -44,6 +44,13 @@ void lcdFirstLine()
         lcd.print("Esp12 connected");
     }
 }
+
+void lcdCmdEcho(const char* echo)
+{
+    lcdCleanLine(0);
+    lcd.setCursor(0, 0);
+    lcd.print(echo);
+}
 void  lcdPMSInfo(){
     lcdCleanLine(0);
     lcdCleanLine(1);

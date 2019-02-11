@@ -5,6 +5,7 @@
 
 File myFile;
 bool isSDReady = true;
+bool isSDEnable = true;
 void setupLogger() {
     if (!SD.begin(4)) {
         Serial.println("SD failed!");
@@ -23,9 +24,14 @@ void setupLogger() {
     myFile = SD.open("log.txt", FILE_WRITE);
     myFile.close();
 }
-
+void disableLogger() {
+    isSDEnable = false;
+}
+void enableLogger() {
+    isSDEnable = true;
+}
 void logging2SD(const char* message) {
-    if (isSDReady)
+    if (isSDReady && isSDEnable)
     {
         myFile = SD.open("log.txt", FILE_WRITE);
 
