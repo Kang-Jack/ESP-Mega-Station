@@ -73,7 +73,7 @@ double chn_pm10_category[7][4] = { {0.0, 50, 0, 50}, {50.1, 150, 51, 100},
                      {150.1, 250, 101, 150}, {250.1, 350, 151, 200},
                      {350.1, 420, 201, 300}, {420.1, 500, 301, 400}, {500.1, 600, 401, 500} };
 
-double caculator(const double* match_category,int iaqi) {
+double caculator(const double* match_category, int iaqi) {
     return (match_category[3] - match_category[2]) / (match_category[1] - match_category[0])*(iaqi - match_category[0]) + match_category[2];
 }
 
@@ -100,7 +100,7 @@ int us_pm2_5_aqi_caculator(int pm2_5_iaqi) {
         snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Heavily");
         return caculator(us_pm2_5_category[4], pm2_5_iaqi);
     }
-    if (pm2_5_iaqi < us_pm2_5_category[5][1]){
+    if (pm2_5_iaqi < us_pm2_5_category[5][1]) {
         snprintf(aqiString, sizeof(aqiString) - 1, "%s", "Hazardous");
         return caculator(us_pm2_5_category[5], pm2_5_iaqi);
     }
@@ -150,30 +150,8 @@ int us_pm10_aqi_caculator(int pm10_iaqi) {
         return caculator(us_pm10_category[6], pm10_iaqi);
     }
 }
-    /*
-        @staticmethod
-        def us_pm10_aqi_caculator(pm10_iaqi) :
-        if debug : print pm10_iaqi
-        if pm10_iaqi < us_pm10_category[0][1] :
-        return caculator(us_pm10_category[0], pm10_iaqi)), "Good"]
-        if pm10_iaqi < us_pm10_category[1][1] :
-        return caculator(us_pm10_category[1], pm10_iaqi)), "Lightly"]
-        if pm10_iaqi < us_pm10_category[2][1] :
-        return caculator(us_pm10_category[2], pm10_iaqi)), "Moderately"]
-        if pm10_iaqi < us_pm10_category[3][1] :
-        return caculator(us_pm10_category[3], pm10_iaqi)), "Unhealthy"]
-        if pm10_iaqi < us_pm10_category[4][1] :
-        return caculator(us_pm10_category[4], pm10_iaqi)), "Heavily"]
-        if pm10_iaqi < us_pm10_category[5][1] :
-        return caculator(us_pm10_category[5], pm10_iaqi)), "Hazardous"]
-        if pm10_iaqi < us_pm10_category[6][1] :
-        return caculator(us_pm10_category[6], pm10_iaqi)), "Severely"]
-        else :
-        return caculator(us_pm10_category[6], pm10_iaqi)), "Severely"]
 
-        */
-
-void setupPMS5003S(){
+void setupPMS5003S() {
     Serial3.begin(9600);
     pms.begin();
     //pms.setMode(ACTIVE);
@@ -197,51 +175,61 @@ void sleep(int pms_mins) {
     delay(500);
     WakeMins = pms_mins;
 }
-void logPMS(int aqi2_5,int aqi10) {
+void logPMS(int aqi2_5, int aqi10) {
     char logMesg[100];
-    char str_temp[7];
-    dtostrf(pmsForm, 4, 4, str_temp);
-    sprintf(logMesg, "(%s) HCHO:%s AQI2_5:%i AQI10:%i Level:%s: PM2.5:%i PM10:%i PM1.0:%i", aqiTime, str_temp, aqi2_5, aqi10, aqiString, pmsAto2_5, pmsAto10, pmsAto1);
+    memset(float_str_temp, 0, sizeof(float_str_temp));
+    dtostrf(pmsForm, 4, 3, float_str_temp);
+    snprintf(logMesg, sizeof(logMesg), "(%s) HCHO:%s AQI2_5:%i AQI10:%i Level:%s: PM2.5:%i PM10:%i PM1.0:%i", aqiTime, float_str_temp, aqi2_5, aqi10, aqiString, pmsAto2_5, pmsAto10, pmsAto1);
     logging2SD(logMesg);
 }
-void handlePMS5003S(int pms_min,int pms_hour){
-    if (WakeMins == 0 && isWake == true){
+void pmsPlayload() {
+    turnOff();
+    memset(float_str_temp, 0, sizeof(float_str_temp));
+    dtostrf(pmsForm, 4, 3, float_str_temp);
+    memset(playload, 0, sizeof(playload));
+    snprintf(playload, sizeof(playload), "{A:%i,2_5:%i,10_:%i,1_0:%i,H:%s}", aqi, pmsAto2_5, pmsAto10, pmsAto1, float_str_temp);
+    Serial2.print((char*)playload);
+}
+void handlePMS5003S(int pms_min, int pms_hour) {
+    if (WakeMins == 0 && isWake == true) {
         WakeMins = pms_min;
     }
     else {
         if (pms_min - WakeMins > 10 && isWake == true) {
             sleep(pms_min);
+            delay(1000);
+            pmsPlayload();// very hour send to mqtt server once after pms sleep
         }
         else if (pms_min == 0 && isWake == false) {
             wake(pms_min);
         }
     }
 
-    if (isWake){
-          pms.request();
-          if(!pms.read()){
+    if (isWake) {
+        pms.request();
+        if (!pms.read()) {
             return;
-          }
-          sprintf(aqiTime, "%i:%i\0", pms_hour, pms_min);
-          pmsAto1 = pms.getPmAto(1.0);
-          pmsAto2_5 = pms.getPmAto(2.5);
-          pmsAto10 = pms.getPmAto(10.0);
-          pmsForm = pms.getForm();
-          int aqi2_5;
-          int aqi10;
-          aqi2_5 = us_pm2_5_aqi_caculator(pmsAto2_5);
-          aqi10 = us_pm10_aqi_caculator(pmsAto10);
-          // aqi = Max {aqi2_5,aqi10}
-          if(aqi2_5 >= aqi10)
-              aqi = us_pm2_5_aqi_caculator(pmsAto2_5);
-          else
-              aqi = us_pm10_aqi_caculator(pmsAto10);
+        }
+        snprintf(aqiTime, sizeof(aqiTime), "%i:%i", pms_hour, pms_min);
+        pmsAto1 = pms.getPmAto(1.0);
+        pmsAto2_5 = pms.getPmAto(2.5);
+        pmsAto10 = pms.getPmAto(10.0);
+        pmsForm = pms.getForm();
+        int aqi2_5;
+        int aqi10;
+        aqi2_5 = us_pm2_5_aqi_caculator(pmsAto2_5);
+        aqi10 = us_pm10_aqi_caculator(pmsAto10);
+        // aqi = Max {aqi2_5,aqi10}
+        if (aqi2_5 >= aqi10)
+            aqi = us_pm2_5_aqi_caculator(pmsAto2_5);
+        else
+            aqi = us_pm10_aqi_caculator(pmsAto10);
 
-          if (lastH != pms_hour || lastM != pms_min) {
-              lastH = pms_hour;
-              lastM = pms_min;
-              logPMS(aqi2_5, aqi10);
-          }
+        if (lastH != pms_hour || lastM != pms_min) {
+            lastH = pms_hour;
+            lastM = pms_min;
+            logPMS(aqi2_5, aqi10);
+        }
     }
 }
 

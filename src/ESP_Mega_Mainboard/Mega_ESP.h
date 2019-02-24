@@ -25,7 +25,7 @@ void talk_esp()
     while (Serial.available() > 0)
     {
         char a = Serial.read();
-        Serial.write(a);
+        //Serial.write(a);
         Serial2.write(a);
     }
 }

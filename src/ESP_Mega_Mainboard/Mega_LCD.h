@@ -51,7 +51,7 @@ void lcdCmdEcho(const char* echo)
     lcd.setCursor(0, 0);
     lcd.print(echo);
 }
-void  lcdPMSInfo(){
+void  lcdPMSInfo() {
     lcdCleanLine(0);
     lcdCleanLine(1);
     lcdCleanLine(2);
@@ -68,14 +68,14 @@ void  lcdPMSInfo(){
     char line3[40];
     char str_temp[7];
 
-    sprintf(line0, " AQI:%i %s", aqi, aqiString);
+    snprintf(line0, sizeof(line0), "AQI:%i %s", aqi, aqiString);
     //Serial.println("string");
     //Serial.println(aqiString);
     /* 4 is mininum width, 3 is precision; float value is copied onto str_temp*/
     dtostrf(pmsForm, 4, 3, str_temp);
-    sprintf(line1, "HCHO:%s PM2.5:%i" , str_temp,pmsAto2_5);
-    sprintf(line2, "PM10:%i PM1.0:%i", pmsAto10, pmsAto1);
-    sprintf(line3, "mg/m3 ug/m3 %s", aqiTime);
+    snprintf(line1, sizeof(line1), "HCHO:%s PM2.5:%i", str_temp, pmsAto2_5);
+    snprintf(line2, sizeof(line2), "PM10:%i PM1.0:%i", pmsAto10, pmsAto1);
+    snprintf(line3, sizeof(line3), "mg/m3 ug/m3 %s", aqiTime);
     lcd.setCursor(0, 0);
     lcd.print(line0);
     lcd.setCursor(0, 1);
@@ -103,11 +103,11 @@ void lcdBMEInfo() {
     char str_temp[7];
     /* 4 is mininum width, 2 is precision; float value is copied onto str_temp*/
     dtostrf(temp, 4, 2, str_temp);
-    sprintf(line1, "Temperature: %s", str_temp);
+    snprintf(line1, sizeof(line1), "Temperature: %s", str_temp);
     dtostrf(hum, 3, 2, str_temp);
-    sprintf(line2, "Humidity: %s%%", str_temp);
+    snprintf(line2, sizeof(line2), "Humidity: %s%%", str_temp);
     dtostrf(pres, 5, 2, str_temp);
-    sprintf(line3, "Pressure: %shPa", str_temp);
+    snprintf(line3, sizeof(line3), "Pressure: %shPa", str_temp);
     lcd.setCursor(0, 1);
     lcd.print(line1);
     lcd.write(0xdf);
@@ -124,10 +124,10 @@ void lcdStartScreen()
     char line1[40];
     char line2[40];
     char line3[40];
-    sprintf(line0, "Hello, world!");
-    sprintf(line1, "ESP Arduino Mega!");
-    sprintf(line2, "Arduino wifi system");
-    sprintf(line3, "Power By Laserk");
+    snprintf(line0, sizeof(line0), "Hello, world!");
+    snprintf(line1, sizeof(line1), "ESP Arduino Mega!");
+    snprintf(line2, sizeof(line2), "Arduino wifi system");
+    snprintf(line3, sizeof(line3), "Power By Laserk");
     lcd.clear();
     lcd.backlight();//noBacklight()
     lcd.setCursor(3, 0);// col ,row start from 0
@@ -151,10 +151,10 @@ void lcdHumAtm(bool bemStatus)
         Serial.println("pres:");
         Serial.println(pres);
         */
-        sprintf(line3, "H:%i%% ATM:%ihPa", (int)hum, (int)pres);
+        snprintf(line3, sizeof(line3), "H:%i%% ATM:%ihPa", (int)hum, (int)pres);
     }
     else
-        sprintf(line3, "Not find BME280 sensor");
+        snprintf(line3, sizeof(line3), "Not find BME280 sensor");
     lcdCleanLine(3);
     lcd.setCursor(0, 3);
     lcd.print(line3);
@@ -274,20 +274,7 @@ void lcdTimeTemp(bool bemStatus) {
         lcd.print("0");
         lcd.print(minute, DEC);
     }
-    /*
-  lcd.print(':');
 
-  lcd.setCursor(6, 2);
-  if (second >= 10)
-  {
-      lcd.print(second, DEC);
-  }
-  else
-  {
-      lcd.print("0");
-      lcd.print(second, DEC);
-  }
-  */
     lcd.setCursor(5, 2);
     if (Clock.checkAlarmEnabled(1))
     {
@@ -321,7 +308,7 @@ void setupLcd() {
 
 void handleLight(int nowS, int nowH, bool isNeedLight) {
     if (lightStatus == true) {
-        if (nowS % 60 == 0){
+        if (nowS % 60 == 0) {
             ActivedTime = ActivedTime + 1;
         }
     }
@@ -335,6 +322,20 @@ void handleLight(int nowS, int nowH, bool isNeedLight) {
     }
 }
 
+void handleDisplay(int nowSeconds, int nowHour,bool bmeS) {
+    if (isWorkingTime(nowHour)) {
+        if (nowSeconds % 60 == 0)
+        {
+            lcdHumAtm(bmeS);
+            lcdTimeTemp(bmeS);
+        }
+
+        if (nowSeconds % 60 == 30)
+        {
+            lcdPMSInfo();
+        }
+    }
+}
 
 
 #endif

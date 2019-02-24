@@ -4,8 +4,8 @@
 #include <SD.h>
 
 File myFile;
-bool isSDReady = true;
-bool isSDEnable = true;
+bool isSDReady = false;
+bool isSDEnable = false;
 void setupLogger() {
     if (!SD.begin(4)) {
         Serial.println("SD failed!");
@@ -13,13 +13,14 @@ void setupLogger() {
     }
     else
     {
+        isSDReady = true;
         Serial.println("SD done");
     }
     if (SD.exists("log.txt")) {
         SD.remove("log.txt");
         Serial.println("log removed.");
     }
-    
+
     Serial.println("Creating...");
     myFile = SD.open("log.txt", FILE_WRITE);
     myFile.close();
@@ -29,6 +30,9 @@ void disableLogger() {
 }
 void enableLogger() {
     isSDEnable = true;
+    if (!isSDReady) {
+        setupLogger();
+    }
 }
 void logging2SD(const char* message) {
     if (isSDReady && isSDEnable)

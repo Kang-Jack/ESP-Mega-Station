@@ -1,9 +1,9 @@
 #include <Wire.h> 
 
 #include "datad.h"
-#include "MEGA_Logger.h"
 #include "MEGA_Time.h"
 #include "Mega_LCD.h"
+#include "MEGA_Logger.h"
 #include "Mega_ESP.h"
 #include "Mega_Sensor.h"
 #include "Mega_PMS5003S.h"
@@ -11,7 +11,7 @@
 
 void setup()
 {   
-    setupLogger();
+    //setupLogger();
     setupSensor();
     setupPMS5003S();
     setupLcd();
@@ -27,6 +27,6 @@ void loop()
     majorWorkOnCondition();
     handleESPCmd();
     listen_esp();
-    talk_esp();
+    //talk_esp();
     delay(100);
 }

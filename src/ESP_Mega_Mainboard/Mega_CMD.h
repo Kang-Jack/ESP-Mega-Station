@@ -1,5 +1,6 @@
 #ifndef MEGA_CMD
 #define MEGA_CMD
+
 bool needLightOn(int nowH) {
     if (!isWorkingTime(nowH)) {
         return false;
@@ -11,9 +12,7 @@ void handleESPCmd()
 {
     if (msg[0] != '\0') {
         Serial.print((char*)msg);
-        lcdCleanLine(0);
-        lcd.setCursor(0, 0);
-        lcd.print(msg);
+        lcdCmdEcho(msg);
 
         String msgString((char*)msg);
         if (msgString == "dark") {
@@ -23,22 +22,21 @@ void handleESPCmd()
             turnOn();
         }
         if (msgString == "bme") {
-            handleBME280();
+            handleBME280(60,0,8);
+            bmePlayload();
             lcdBMEInfo();
         }
         if (msgString == "pms") {
-            handlePMS5003S(0,0);
+            handlePMS5003S(0, 0);
+            pmsPlayload();
             lcdPMSInfo();
         }
         if (msgString == "disable_log") {
             disableLogger();
-            lcdCmdEcho("log disabled");
         }
         if (msgString == "enable_log") {
             enableLogger();
-            lcdCmdEcho("log enabled");
         }
-        //int index = msgString.indexOf("time:");
         if (msgString.startsWith("timego")) {
             for (int a = 0; a < 14; a++)
             {
@@ -47,6 +45,7 @@ void handleESPCmd()
             setDS3231();
         }
         Serial2.print("received");
+        memset(msg, 0, sizeof(msg));
         msg[0] = '\0';
     }
 }
@@ -57,23 +56,8 @@ void majorWorkOnCondition() {
     int nowMins = getNowMinute();
     bool isNeedLight = needLightOn(nowHour);
     handleLight(nowSeconds, nowHour, isNeedLight);
-    if (isWorkingTime(nowHour)) {
-        if (nowSeconds % 60 == 0)
-        {
-            //Serial.println("time");
-            //Serial.println(nowSeconds);
-            handleBME280();
-            lcdHumAtm(bmeStatus);
-            lcdTimeTemp(bmeStatus);
-
-        }
-        handlePMS5003S(nowMins, nowHour);
-        if (nowSeconds % 60 == 30)
-        {
-            //Serial.println("pms");
-            //Serial.println(nowSeconds);
-            lcdPMSInfo();
-        }
-    }
+    handlePMS5003S(nowMins, nowHour);
+    handleBME280(nowSeconds, nowMins, nowHour);
+    handleDisplay(nowSeconds, nowHour, bmeStatus);
 }
 #endif

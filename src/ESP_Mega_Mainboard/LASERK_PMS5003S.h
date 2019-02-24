@@ -2,9 +2,9 @@
 #define LASERK_PMS5003S_H
 
 #if ARDUINO < 100
-  #include <WProgram.h>
+#include <WProgram.h>
 #else
-  #include <Arduino.h>
+#include <Arduino.h>
 #endif
 
 #include <SoftwareSerial.h>
@@ -52,34 +52,34 @@
 
 class LASERK_PMS5003S {
 public:
-  unsigned int data[16];
+    unsigned int data[16];
 
-  LASERK_PMS5003S(SoftwareSerial *);
-  LASERK_PMS5003S(HardwareSerial *);
-  //Setup
-  int begin();
-  void sleep();
-  void wakeUp();
-  void setMode(byte);
-  void request();
-  int read(unsigned long = 900);
+    LASERK_PMS5003S(SoftwareSerial *);
+    LASERK_PMS5003S(HardwareSerial *);
+    //Setup
+    int begin();
+    void sleep();
+    void wakeUp();
+    void setMode(byte);
+    void request();
+    int read(unsigned long = 900);
 
-  //Get the parameters
-  double getForm();
-  unsigned int getPcs(double);    //available to 10, 5, 2.5, 1, 0.5, 0.3
-  unsigned int getPmAto(double);  //availalbe to 10, 2.5, 1
-  unsigned int getPmCf1(double);  //availalbe to 10, 2.5, 1
+    //Get the parameters
+    double getForm();
+    unsigned int getPcs(double);    //available to 10, 5, 2.5, 1, 0.5, 0.3
+    unsigned int getPmAto(double);  //availalbe to 10, 2.5, 1
+    unsigned int getPmCf1(double);  //availalbe to 10, 2.5, 1
 
 private:
-  byte Packet[5] = {0x42,0x4d,0,};
-  byte buffer[32];
+    byte Packet[5] = { 0x42,0x4d,0, };
+    byte buffer[32];
 
-  SoftwareSerial *sofSeri;
-  HardwareSerial *hwSeri;
-  Stream *Seri;
-  unsigned int LRC = 0;
-  void send(byte,byte,byte);
-  void parseG5s(unsigned char ucData);
+    SoftwareSerial *sofSeri;
+    HardwareSerial *hwSeri;
+    Stream *Seri;
+    unsigned int LRC = 0;
+    void send(byte, byte, byte);
+    void parseG5s(unsigned char ucData);
 };
 
 #endif

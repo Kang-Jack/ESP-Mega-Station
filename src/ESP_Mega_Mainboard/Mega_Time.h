@@ -80,6 +80,4 @@ bool isWorkingTime(int hour) {
     return true;
 }
 
-
-
 #endif
