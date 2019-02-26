@@ -4,7 +4,6 @@
 #include "LASERK_PMS5003S.h"
 int WakeMins = 0;
 bool isWake = false;
-bool isActive = false;
 int lastM = 0;
 int lastH = 0;
 LASERK_PMS5003S pms(&Serial3);
@@ -160,16 +159,17 @@ void setupPMS5003S() {
     delay(500);
     isWake = true;
     WakeMins = 0;
-    isActive = true;
 }
 
 void wake(int pms_mins) {
+    Serial2.print("pms wake");
     isWake = true;
     pms.wakeUp();
     delay(500);
     WakeMins = pms_mins;
 }
 void sleep(int pms_mins) {
+    Serial2.print("pms sleep");
     isWake = false;
     pms.sleep();
     delay(500);
@@ -194,13 +194,17 @@ void handlePMS5003S(int pms_min, int pms_hour) {
     if (WakeMins == 0 && isWake == true) {
         WakeMins = pms_min;
     }
+    else if (WakeMins > 52 && isWake == true) {
+        if (WakeMins - pms_min > 0)
+            WakeMins = pms_min;
+    }
     else {
-        if (pms_min - WakeMins > 10 && isWake == true) {
+        if (pms_min - WakeMins > 6 && isWake == true) {
             sleep(pms_min);
             delay(1000);
             pmsPlayload();// very hour send to mqtt server once after pms sleep
         }
-        else if (pms_min == 0 && isWake == false) {
+        else if (pms_min <3 && isWake == false) {
             wake(pms_min);
         }
     }

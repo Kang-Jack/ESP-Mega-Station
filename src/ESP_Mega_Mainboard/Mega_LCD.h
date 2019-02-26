@@ -7,6 +7,7 @@
 
 LiquidCrystal_I2C lcd(0x3f, 20, 4);  // set the LCD address to 0x3f for a 16 chars and 2 line display
 bool lightStatus = false;
+bool cmdLight = true;
 char emptyLine[40] = "                    ";
 
 void lcdCleanLine(int row) {
@@ -51,16 +52,13 @@ void lcdCmdEcho(const char* echo)
     lcd.setCursor(0, 0);
     lcd.print(echo);
 }
-void  lcdPMSInfo() {
+void  lcdPMSInfo(bool isCmd) {
     lcdCleanLine(0);
     lcdCleanLine(1);
     lcdCleanLine(2);
     lcdCleanLine(3);
-    if (lightStatus == false) {
-        lcd.backlight();
-        lightStatus = true;
-        Serial.print("turn on light");
-        ActivedTime = 0;
+    if (isCmd) {
+        turnOn();
     }
     char line0[40];
     char line1[40];
@@ -91,12 +89,7 @@ void lcdBMEInfo() {
     lcdCleanLine(1);
     lcdCleanLine(2);
     lcdCleanLine(3);
-    if (lightStatus == false) {
-        lcd.backlight();
-        lightStatus = true;
-        Serial.print("turn on light");
-        ActivedTime = 0;
-    }
+    turnOn();
     char line1[40];
     char line2[40];
     char line3[40];
@@ -129,7 +122,6 @@ void lcdStartScreen()
     snprintf(line2, sizeof(line2), "Arduino wifi system");
     snprintf(line3, sizeof(line3), "Power By Laserk");
     lcd.clear();
-    lcd.backlight();//noBacklight()
     lcd.setCursor(3, 0);// col ,row start from 0
     lcd.print(line0);
     lcd.setCursor(2, 1);
@@ -306,7 +298,7 @@ void setupLcd() {
 }
 
 
-void handleLight(int nowS, int nowH, bool isNeedLight) {
+void handleLight(int nowS, bool isNeedLight) {
     if (lightStatus == true) {
         if (nowS % 60 == 0) {
             ActivedTime = ActivedTime + 1;
@@ -332,7 +324,7 @@ void handleDisplay(int nowSeconds, int nowHour,bool bmeS) {
 
         if (nowSeconds % 60 == 30)
         {
-            lcdPMSInfo();
+            lcdPMSInfo(false);
         }
     }
 }

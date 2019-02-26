@@ -1,8 +1,8 @@
 #ifndef MEGA_CMD
 #define MEGA_CMD
 
-bool needLightOn(int nowH) {
-    if (!isWorkingTime(nowH)) {
+bool needLightOn() {
+    if (!cmdLight) {
         return false;
     }
     return isAnyOneHere();
@@ -16,9 +16,11 @@ void handleESPCmd()
 
         String msgString((char*)msg);
         if (msgString == "dark") {
+            cmdLight = false;
             turnOff();
         }
-        if (msgString == "light") {
+        if (msgString == "light"){
+            cmdLight = true;
             turnOn();
         }
         if (msgString == "bme") {
@@ -29,7 +31,7 @@ void handleESPCmd()
         if (msgString == "pms") {
             handlePMS5003S(0, 0);
             pmsPlayload();
-            lcdPMSInfo();
+            lcdPMSInfo(true);
         }
         if (msgString == "disable_log") {
             disableLogger();
@@ -54,8 +56,8 @@ void majorWorkOnCondition() {
     int nowSeconds = getNowSeconds();
     int nowHour = getNowHour();
     int nowMins = getNowMinute();
-    bool isNeedLight = needLightOn(nowHour);
-    handleLight(nowSeconds, nowHour, isNeedLight);
+    bool isNeedLight = needLightOn();
+    handleLight(nowSeconds, isNeedLight);
     handlePMS5003S(nowMins, nowHour);
     handleBME280(nowSeconds, nowMins, nowHour);
     handleDisplay(nowSeconds, nowHour, bmeStatus);
