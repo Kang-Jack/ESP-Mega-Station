@@ -49,7 +49,7 @@ void setup(void) {
 
     Serial.println("WebServer started");
     delay(500);
-    Serial.println("ESP Ver. 0.18.0");
+    Serial.println("ESP Ver. 0.18.3");
     tkSecond.attach(1, Second_Tick);
     UDPNTPClient.begin(2390);  // Port for NTP receive
 

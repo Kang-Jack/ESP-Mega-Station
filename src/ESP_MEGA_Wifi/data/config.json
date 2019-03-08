@@ -1,20 +1,20 @@
 {
-  "ssid": "SSID",
-  "password": "PASSWORD",
+  "ssid": "",
+  "password": "",
   "dhcp": true,
   "IP": [
-    192,
-    168,
-    XXX,
-    XXX
+    0,
+    0,
+    0,
+    0
   ],
   "MqttIP": [
-    192,
-    168,
-    XXX,
-    XXX
+    0,
+    0,
+    0,
+    0
   ],
-  "MqttPort": 1883,
+  "MqttPort": 0,
   "Netmask": [
     255,
     255,
@@ -22,10 +22,10 @@
     0
   ],
   "Gateway": [
-    192,
-    168,
-    XXX,
-    XXX
+    0,
+    0,
+    0,
+    0
   ],
   "ntpServerName": "cn.pool.ntp.org",
   "Update_Time_Via_NTP_Every": 0,

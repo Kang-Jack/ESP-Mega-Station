@@ -209,14 +209,14 @@ void ReadConfig(){
     else {
         Serial.println("default Conf");
         // DEFAULT CONFIG
-        config.ssid = "SSID";
-        config.password = "PASS";
+        config.ssid = "XXX";
+        config.password = "XXX";
         config.dhcp = false;
-        config.IP[0] = 192; config.IP[1] = 168; config.IP[2] = XXX; config.IP[3] = XXX;
-        config.MqttIP[0] = XXX; config.MqttIP[1] = XXX; config.MqttIP[2] = XXX; config.MqttIP[3] = XXX;
-        config.MqttPort = 1883;
+        config.IP[0] = 0; config.IP[1] = 0; config.IP[2] = 0; config.IP[3] = 0;
+        config.MqttIP[0] = 0; config.MqttIP[1] = 0; config.MqttIP[2] = 0; config.MqttIP[3] = 0;
+        config.MqttPort = 0;
         config.Netmask[0] = 255; config.Netmask[1] = 255; config.Netmask[2] = 255; config.Netmask[3] = 0;
-        config.Gateway[0] = 192; config.Gateway[1] = 168; config.Gateway[2] = XXX; config.Gateway[3] = XXX;
+        config.Gateway[0] = 0; config.Gateway[1] = 0; config.Gateway[2] = 0; config.Gateway[3] = 0;
         config.ntpServerName = "cn.pool.ntp.org";
         config.Update_Time_Via_NTP_Every = 0;
         config.timezone = -10;

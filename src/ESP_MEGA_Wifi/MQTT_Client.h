@@ -13,7 +13,7 @@ const int max_length = 40;
 char msg[40];
 
 int tryTime = 10;
-char mqttCharServer[100];
+char mqttCharServer[20];
 
 void set_end_mark(int i) {
     if (max_length > i) msg[i] = '\0';
@@ -24,12 +24,12 @@ void Set_serverName(){
     //clean char array
     memset(mqttCharServer, 0, sizeof(mqttCharServer));
     if (config.mqtt_server_domain == "local" || config.mqtt_server_domain == "") {
-        sprintf(mqttCharServer, "%i.%i.%i.%i", config.MqttIP[0], config.MqttIP[1], config.MqttIP[2], config.MqttIP[3]);
+        snprintf(mqttCharServer, sizeof(mqttCharServer), "%i.%i.%i.%i", config.MqttIP[0], config.MqttIP[1], config.MqttIP[2], config.MqttIP[3]);
     }
     else
     {
         // Copy this string into it
-        snprintf(mqttCharServer, sizeof(mqttCharServer) - 1, "%s", config.mqtt_server_domain.c_str());
+        snprintf(mqttCharServer, sizeof(mqttCharServer), "%s", config.mqtt_server_domain.c_str());
     }
     // Ensure we're terminated
     mqttCharServer[sizeof(mqttCharServer)] = '\0';
@@ -115,13 +115,17 @@ void listen_master() {
     if (i == 0) return;
     set_end_mark(i);
     String msgString((char*)msg);
-    if (msgString == "received")  msg[0] = '\0';
+    if (msgString == "received") {
+        memset(msg, 0, sizeof(msg));
+        msg[0] = '\0';
+    }
     else {
         if (WiFi.status() != WL_CONNECTED) {
             ConfigureWifi();
             Set_mqtt_server();
         }
         publish_msg((char*)msg);
+        memset(msg, 0, sizeof(msg));
         msg[0] = '\0';
     }
 }
@@ -129,6 +133,7 @@ void listen_master() {
 void talk_master() {
     if (msg[0] != '\0') {
         Serial.print((char*)msg);
+        memset(msg, 0, sizeof(msg));
         msg[0] = '\0';
     }
 }
